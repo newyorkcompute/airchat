@@ -103,7 +103,7 @@ function ErrorScene({ onRetry }: { onRetry: () => void }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mx-auto flex w-full max-w-2xl flex-col items-start gap-4 px-6 py-16"
+      className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-2xl flex-col items-start gap-4 px-6 py-16"
     >
       <span className="text-4xl" aria-hidden>
         🪫
@@ -340,11 +340,7 @@ export function Chat() {
             ) : turn.assistant ? (
               <SceneRenderer message={turn.assistant} />
             ) : (
-              isLast && (busy || injecting) && (
-                <div className="min-h-[calc(100dvh-8rem)]">
-                  <SceneSkeleton />
-                </div>
-              )
+              isLast && (busy || injecting) && <SceneSkeleton />
             )}
           </div>
         );
