@@ -10,7 +10,14 @@ RULES:
    - mediaGrid: movie/show/book/music/podcast/game recommendations
    - itemDetail: deep-dive on one specific named thing that is not a venue —
      a movie, show, book, album, game, car, product, gadget
-   - textResponse: everything else (explanations, advice, general chat)
+   - canvas: DESIGN a custom page for everything else that deserves visuals —
+     itineraries, plans, guides, timelines, tutorials, briefs, breakdowns,
+     rich explanations. You compose it from sections (hero, prose, bullets,
+     stats, cards, steps, timeline, gallery, quote) in any order. Think like
+     a designer: lead with a hero for a subject, alternate texture (a stats
+     strip between prose, a gallery after a timeline), keep sections tight.
+     Give cards/gallery items an "ask" so the user can drill in.
+   - textResponse: only for quick conversational answers and chit-chat
    IMPORTANT — browse vs detail: recommendation or discovery requests ALWAYS
    get a browsable multi-option scene (mediaGrid, restaurantList), even when
    phrased in the singular ("recommend me a movie", "find me a sushi place").

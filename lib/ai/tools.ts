@@ -254,9 +254,86 @@ export const sceneTools = {
     execute: async () => ({ displayed: true }),
   }),
 
+  canvas: tool({
+    description:
+      "Design a custom page from composable sections for anything without a dedicated scene: travel itineraries, plans, guides, timelines, breakdowns, briefs, tutorials, rich explanations. You choose the sections, their order, and their content — compose 2-7 sections that best express the answer visually.",
+    inputSchema: z.object({
+      intro,
+      sections: z
+        .array(
+          z.object({
+            kind: z
+              .enum([
+                "hero",
+                "prose",
+                "bullets",
+                "stats",
+                "cards",
+                "steps",
+                "timeline",
+                "gallery",
+                "quote",
+              ])
+              .describe(
+                "hero: big centered image/emoji + title + one-liner (open with this for a subject). prose: heading + short paragraph. bullets: emoji-led key points. stats: strip of big value + small label pairs. cards: grid of rich tappable cards (image, title, detail). steps: numbered how-to sequence. timeline: chronological/scheduled entries with a time label per item. gallery: grid of visual tiles (image + caption). quote: one standout pull-quote."
+              ),
+            title: z
+              .string()
+              .optional()
+              .describe(
+                "Section heading. For hero: the page title. Omit where a heading adds nothing."
+              ),
+            body: z
+              .string()
+              .optional()
+              .describe(
+                "Prose text: the paragraph (prose), subtitle one-liner (hero), or quote text (quote)."
+              ),
+            emoji: emoji.optional().describe("Hero emoji placeholder"),
+            imageQuery: imageQuery.describe(
+              "Image for hero sections, e.g. 'Tokyo skyline dusk'"
+            ),
+            items: z
+              .array(
+                z.object({
+                  emoji: emoji.optional(),
+                  imageQuery,
+                  label: z
+                    .string()
+                    .optional()
+                    .describe(
+                      "Small kicker: stat label ('Range'), time ('9:00'), day ('Day 1'), step tag, or quote attribution"
+                    ),
+                  title: z.string().optional().describe("Item headline"),
+                  detail: z
+                    .string()
+                    .optional()
+                    .describe("One supporting sentence"),
+                  value: z
+                    .string()
+                    .optional()
+                    .describe("Stat value, e.g. '516 mi' (stats only)"),
+                  ask: ask
+                    .optional()
+                    .describe(
+                      "Include when tapping this item should open a deeper scene about it"
+                    ),
+                })
+              )
+              .max(8)
+              .optional()
+              .describe("The section's entries; omit for hero/prose/quote"),
+          })
+        )
+        .min(2)
+        .max(7),
+    }),
+    execute: async () => ({ displayed: true }),
+  }),
+
   textResponse: tool({
     description:
-      "Fallback for anything that does not fit the other scenes: explanations, advice, general questions, chit-chat. Prefer a more specific scene when possible.",
+      "Short conversational fallback: quick answers, chit-chat, brief advice. If the answer deserves structure or visuals, prefer canvas or a specific scene.",
     inputSchema: z.object({
       intro,
       heading: z.string().describe("Short title for the answer"),

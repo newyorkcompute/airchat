@@ -10,6 +10,7 @@ import { ComparisonScene } from "@/components/scenes/comparison-scene";
 import { RecipeScene } from "@/components/scenes/recipe-scene";
 import { MediaGridScene } from "@/components/scenes/media-grid-scene";
 import { ItemDetailScene } from "@/components/scenes/item-detail-scene";
+import { CanvasScene } from "@/components/scenes/canvas-scene";
 import { TextResponseScene } from "@/components/scenes/text-response-scene";
 
 type Part = AirchatUIMessage["parts"][number];
@@ -89,6 +90,8 @@ function SceneBody({ part }: { part: Part }) {
       return <MediaGridScene input={part.input as any} />;
     case "tool-itemDetail":
       return <ItemDetailScene input={part.input as any} />;
+    case "tool-canvas":
+      return <CanvasScene input={part.input as any} />;
     case "tool-textResponse":
       return <TextResponseScene input={part.input as any} />;
     default:
