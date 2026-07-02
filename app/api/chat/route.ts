@@ -2,6 +2,7 @@ import { streamText, convertToModelMessages, stepCountIs } from "ai";
 import { sceneTools, type AirchatUIMessage } from "@/lib/ai/tools";
 import { SYSTEM_PROMPT } from "@/lib/ai/system-prompt";
 import { MODEL_ID, FALLBACK_MODELS } from "@/lib/ai/model";
+import { isRateLimited, clientIp } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -9,6 +10,13 @@ const MAX_MESSAGES = 30;
 const MAX_TEXT_LENGTH = 2000;
 
 export async function POST(request: Request) {
+  if (isRateLimited(clientIp(request))) {
+    return Response.json(
+      { error: "Too many requests — take a breath and try again in a minute." },
+      { status: 429 }
+    );
+  }
+
   const { messages }: { messages: AirchatUIMessage[] } = await request.json();
 
   const lastMessage = messages.at(-1);
