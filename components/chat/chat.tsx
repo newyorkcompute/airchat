@@ -86,7 +86,10 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
         transition: { duration: 0.25, ease: EASE_OUT },
       }}
       transition={{ duration: 0.4, ease: EASE_OUT }}
-      className="flex min-h-dvh flex-col items-center px-6 text-center"
+      // Overlay, not flow: while this exits, the first turn must already
+      // sit at y=0 underneath it. In-flow it would occupy a full viewport,
+      // and its unmount would collapse the document and yank the scroll.
+      className="absolute inset-x-0 top-0 z-[15] flex min-h-dvh flex-col items-center bg-background px-6 text-center"
     >
       {/* Hero fills the area above the mid-screen composer (its pill
           center sits at 45dvh — keep these in sync with composer.tsx). */}
