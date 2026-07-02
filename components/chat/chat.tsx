@@ -33,26 +33,29 @@ const SUGGESTIONS = [
 function UserPromptBar({
   message,
   onBack,
-  sticky = true,
+  fixed = false,
 }: {
   message: AirchatUIMessage;
   onBack?: () => void;
-  sticky?: boolean;
+  fixed?: boolean;
 }) {
   const text = message.parts
     .map((p) => (p.type === "text" ? p.text : ""))
     .join("");
   if (!text) return null;
   return (
-    // Floating pill, not a full-width band: it stays clear of the brand
-    // and icon capsules so scene content visibly slides underneath.
+    // Active turn: fixed at top-2 so loading → loaded swaps never nudge the
+    // pill (sticky + scroll-follow was shifting it as content height changed).
+    // Older turns: in-flow at the top of their section for scroll-back.
     <motion.div
       initial={{ opacity: 0, transform: "translateY(-12px)" }}
       animate={{ opacity: 1, transform: "translateY(0px)" }}
       transition={{ duration: 0.25, ease: EASE_OUT }}
       className={cn(
-        "mx-auto w-fit max-w-[min(34rem,calc(100%-18rem))] max-md:max-w-[calc(100%-11rem)]",
-        sticky && "sticky top-2 z-20"
+        "w-fit max-w-[min(34rem,calc(100%-18rem))] max-md:max-w-[calc(100%-11rem)]",
+        fixed
+          ? "fixed left-1/2 top-2 z-20 -translate-x-1/2"
+          : "relative mx-auto"
       )}
     >
       <div
@@ -183,6 +186,7 @@ export function Chat() {
 
   const busy = status === "submitted" || status === "streaming";
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [pinnedTurn, setPinnedTurn] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastScrolledKey = useRef<string | null>(null);
   const stopGlideRef = useRef<(() => void) | null>(null);
@@ -264,6 +268,7 @@ export function Chat() {
   };
 
   const glideToTurn = (index: number) => {
+    setPinnedTurn(index);
     const turnElements =
       containerRef.current?.querySelectorAll<HTMLElement>("[data-turn]");
     const el = turnElements?.[index];
@@ -374,7 +379,9 @@ export function Chat() {
     const timer = setTimeout(() => {
       const turnElements =
         containerRef.current?.querySelectorAll<HTMLElement>("[data-turn]");
-      const last = turnElements?.[turnElements.length - 1];
+      const lastIdx = Math.max(0, (turnElements?.length ?? 1) - 1);
+      setPinnedTurn(lastIdx);
+      const last = turnElements?.[lastIdx];
       if (last) glideToElement(last, true);
     }, 30);
     return () => clearTimeout(timer);
@@ -470,14 +477,16 @@ export function Chat() {
           <div
             key={turn.user?.id ?? turn.assistant?.id ?? i}
             data-turn
-            className="border-b border-border/40 last:border-b-0"
           >
             {turn.user && (
-              <UserPromptBar
-                message={turn.user}
-                onBack={i > 0 ? () => glideToTurn(i - 1) : undefined}
-                sticky={isLast}
-              />
+              <>
+                {i === pinnedTurn && <div className="h-12" aria-hidden />}
+                <UserPromptBar
+                  message={turn.user}
+                  onBack={i > 0 ? () => glideToTurn(i - 1) : undefined}
+                  fixed={i === pinnedTurn}
+                />
+              </>
             )}
             {isLast && error && !busy ? (
               <ErrorScene onRetry={() => regenerate()} />
