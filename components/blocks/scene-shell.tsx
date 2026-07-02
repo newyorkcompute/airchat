@@ -104,11 +104,19 @@ export function StaggerItem({
   className,
   onClick,
   role,
+  onPointerEnter,
+  onPointerLeave,
+  onTouchStart,
+  onFocus,
 }: {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
   role?: string;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
+  onTouchStart?: () => void;
+  onFocus?: () => void;
 }) {
   return (
     <motion.div
@@ -117,6 +125,10 @@ export function StaggerItem({
       onClick={onClick}
       role={role}
       tabIndex={onClick ? 0 : undefined}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+      onTouchStart={onTouchStart}
+      onFocus={onFocus}
       onKeyDown={
         onClick
           ? (e) => {

@@ -8,7 +8,6 @@ import {
   Stagger,
 } from "@/components/blocks/scene-shell";
 import { ItemRow } from "@/components/blocks/item-row";
-import { useSceneActions } from "@/components/chat/scene-context";
 import type { ScenePartInput } from "./types";
 
 export function RestaurantListScene({
@@ -16,7 +15,6 @@ export function RestaurantListScene({
 }: {
   input: ScenePartInput<"restaurantList">;
 }) {
-  const { ask } = useSceneActions();
   const places = input?.places?.filter(Boolean) ?? [];
   return (
     <SceneShell>
@@ -39,14 +37,10 @@ export function RestaurantListScene({
               priceLevel={place?.priceLevel}
               blurb={place?.blurb}
               tags={place?.tags?.filter(Boolean) as string[] | undefined}
-              onClick={(() => {
-                const prompt =
-                  place?.ask ??
-                  (place?.name
-                    ? `Tell me more about ${place.name}`
-                    : undefined);
-                return prompt ? () => ask(prompt) : undefined;
-              })()}
+              ask={
+                place?.ask ??
+                (place?.name ? `Tell me more about ${place.name}` : undefined)
+              }
             />
           ))}
         </Stagger>

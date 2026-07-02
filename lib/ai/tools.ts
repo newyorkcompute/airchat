@@ -26,6 +26,18 @@ const ask = z
     "Follow-up prompt sent when the user taps this item, phrased in the user's voice, e.g. 'Tell me more about the Lucid Air'"
   );
 
+/**
+ * Like `ask`, the model authors the image lookup for each visual item.
+ * The client resolves it via /api/image after the scene renders; the
+ * emoji stays as an instant placeholder and fallback.
+ */
+const imageQuery = z
+  .string()
+  .optional()
+  .describe(
+    "2-5 word image search query for a photo of this item, e.g. 'Lucid Air sedan', 'Paddington 2 movie poster', 'omakase sushi platter'"
+  );
+
 export const sceneTools = {
   restaurantList: tool({
     description:
@@ -46,6 +58,7 @@ export const sceneTools = {
               .describe("One vivid sentence on why this place is special"),
             tags: z.array(z.string()).max(3),
             ask,
+            imageQuery,
           })
         )
         .min(3)
@@ -61,6 +74,7 @@ export const sceneTools = {
       intro,
       emoji,
       name: z.string(),
+      imageQuery,
       rating: z.number().min(1).max(5),
       category: z.string().describe("e.g. 'Japanese'"),
       location: z.string().describe("Street or neighborhood, e.g. 'Fore St'"),

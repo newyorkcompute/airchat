@@ -2,10 +2,13 @@
 
 import { StaggerItem } from "./scene-shell";
 import { RatingStars, PriceLevel, TagPills } from "./inline";
+import { useAskIntent } from "./tappable";
+import { useSceneActions } from "@/components/chat/scene-context";
 
 /**
  * List row for a place: emoji avatar, name/rating line, blurb, tags.
- * Tappable when `onClick` is provided — opens a detail scene.
+ * Tappable when `ask` is provided — sends it as the next turn (with
+ * hover/touch prefetch), opening a detail scene.
  */
 export function ItemRow({
   emoji,
@@ -15,7 +18,7 @@ export function ItemRow({
   priceLevel,
   blurb,
   tags,
-  onClick,
+  ask,
 }: {
   emoji?: string;
   name?: string;
@@ -24,13 +27,16 @@ export function ItemRow({
   priceLevel?: number;
   blurb?: string;
   tags?: string[];
-  onClick?: () => void;
+  ask?: string;
 }) {
+  const actions = useSceneActions();
+  const intent = useAskIntent(ask);
   return (
     <StaggerItem
       className="flex cursor-pointer gap-4 rounded-2xl bg-card p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] ring-1 ring-border/60 transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]"
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
+      onClick={ask ? () => actions.ask(ask) : undefined}
+      role={ask ? "button" : undefined}
+      {...intent}
     >
       <div
         className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-muted text-3xl"

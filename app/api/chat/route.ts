@@ -30,6 +30,9 @@ export async function POST(request: Request) {
   const result = streamText({
     model: MODEL_ID,
     system: SYSTEM_PROMPT,
+    // Stop generating when the client disconnects — abandoned speculative
+    // prefetches from the UI get cancelled instead of burning tokens.
+    abortSignal: request.signal,
     messages: await convertToModelMessages(messages.slice(-MAX_MESSAGES)),
     tools: sceneTools,
     toolChoice: "required",

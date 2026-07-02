@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import type { AirchatUIMessage } from "@/lib/ai/tools";
+import { prefetchAssistantMessage, makeUserMessage } from "@/lib/prefetch";
 import { SceneRenderer } from "./scene-renderer";
 import { SceneActionsContext } from "./scene-context";
 import { Composer } from "./composer";
@@ -175,8 +176,83 @@ export function Chat() {
     if (el) glideToElement(el);
   };
 
+  // ---- Speculative next-turn prefetch -------------------------------------
+  // Hovering/touching a tappable item starts generating its scene early;
+  // if the user actually taps, we inject the (possibly already finished)
+  // result instead of starting from zero. Keyed by the conversation head so
+  // stale prefetches can never leak into a different context.
+  const [injecting, setInjecting] = useState(false);
+  const messagesRef = useRef(messages);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+  const prefetches = useRef(
+    new Map<
+      string,
+      { promise: Promise<AirchatUIMessage>; controller: AbortController }
+    >()
+  );
+  const MAX_PREFETCHES_PER_SCENE = 3;
+
+  const clearPrefetches = () => {
+    for (const { controller } of prefetches.current.values())
+      controller.abort();
+    prefetches.current.clear();
+  };
+
+  const prefetchKey = (text: string) =>
+    `${messagesRef.current.at(-1)?.id ?? "root"}:${text}`;
+
+  const prefetch = (text: string) => {
+    if (busy || injecting) return;
+    const key = prefetchKey(text);
+    if (prefetches.current.has(key)) return;
+    if (prefetches.current.size >= MAX_PREFETCHES_PER_SCENE) return;
+    const controller = new AbortController();
+    const promise = prefetchAssistantMessage(
+      messagesRef.current,
+      text,
+      controller.signal
+    );
+    // Failed speculation just falls back to a normal turn on tap.
+    promise.catch(() => prefetches.current.delete(key));
+    prefetches.current.set(key, { promise, controller });
+  };
+
+  const ask = async (text: string) => {
+    if (busy || injecting) return;
+    const key = prefetchKey(text);
+    const hit = prefetches.current.get(key);
+    // Abort speculation for the paths not taken.
+    for (const [k, entry] of prefetches.current) {
+      if (entry !== hit) {
+        entry.controller.abort();
+        prefetches.current.delete(k);
+      }
+    }
+    if (!hit) {
+      sendMessage({ text });
+      return;
+    }
+    const base = messagesRef.current;
+    const userMessage = makeUserMessage(text);
+    setInjecting(true);
+    setMessages([...base, userMessage]);
+    try {
+      const assistantMessage = await hit.promise;
+      setMessages([...base, userMessage, assistantMessage]);
+    } catch {
+      setMessages(base);
+      sendMessage({ text });
+    } finally {
+      prefetches.current.delete(key);
+      setInjecting(false);
+    }
+  };
+
   const startNewChat = () => {
     if (busy) stop();
+    clearPrefetches();
     setMessages([]);
     lastScrolledKey.current = null;
     window.scrollTo(0, 0);
@@ -219,13 +295,7 @@ export function Chat() {
 
   return (
     <MotionConfig reducedMotion="user">
-    <SceneActionsContext.Provider
-      value={{
-        ask: (text) => {
-          if (!busy) sendMessage({ text });
-        },
-      }}
-    >
+    <SceneActionsContext.Provider value={{ ask, prefetch }}>
     <div ref={containerRef} className="relative">
       <AnimatePresence>
         {messages.length > 0 && (
@@ -270,7 +340,7 @@ export function Chat() {
             ) : turn.assistant ? (
               <SceneRenderer message={turn.assistant} />
             ) : (
-              isLast && busy && (
+              isLast && (busy || injecting) && (
                 <div className="min-h-[calc(100dvh-8rem)]">
                   <SceneSkeleton />
                 </div>
@@ -281,9 +351,13 @@ export function Chat() {
       })}
 
       <Composer
-        busy={busy}
+        busy={busy || injecting}
         onStop={stop}
-        onSend={(text) => sendMessage({ text })}
+        onSend={(text) => {
+          // A typed message invalidates any speculation for tap targets.
+          clearPrefetches();
+          sendMessage({ text });
+        }}
       />
     </div>
     </SceneActionsContext.Provider>
