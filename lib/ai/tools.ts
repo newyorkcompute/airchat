@@ -15,6 +15,17 @@ const intro = z
 
 const emoji = z.string().describe("A single emoji");
 
+/**
+ * Every tappable item carries the follow-up prompt it fires when tapped.
+ * The model authors it, so the UI never has to invent per-domain prompt
+ * strings — this is what makes drill-down work for any kind of entity.
+ */
+const ask = z
+  .string()
+  .describe(
+    "Follow-up prompt sent when the user taps this item, phrased in the user's voice, e.g. 'Tell me more about the Lucid Air'"
+  );
+
 export const sceneTools = {
   restaurantList: tool({
     description:
@@ -34,6 +45,7 @@ export const sceneTools = {
               .string()
               .describe("One vivid sentence on why this place is special"),
             tags: z.array(z.string()).max(3),
+            ask,
           })
         )
         .min(3)
@@ -75,11 +87,13 @@ export const sceneTools = {
         emoji,
         name: z.string(),
         subtitle: z.string().describe("e.g. 'From $70,000'"),
+        ask,
       }),
       itemB: z.object({
         emoji,
         name: z.string(),
         subtitle: z.string(),
+        ask,
       }),
       sections: z
         .array(
@@ -149,17 +163,24 @@ export const sceneTools = {
     execute: async () => ({ displayed: true }),
   }),
 
-  mediaDetail: tool({
+  itemDetail: tool({
     description:
-      "Show a rich detail page for ONE movie, show, book, album, podcast or game. Use when the user asks about a single title.",
+      "Show a rich detail page for ONE specific named thing that is not a venue: a movie, show, book, album, podcast, game, car, product, gadget, etc. ONLY use when the user refers to one specific item by name (e.g. 'tell me more about La La Land', 'tell me more about the Lucid Air'). NEVER use for recommendation/discovery requests — those go to mediaGrid, even when phrased in the singular ('recommend me a movie').",
     inputSchema: z.object({
       intro,
       emoji,
       title: z.string(),
       subtitle: z
         .string()
-        .describe("Meta line, e.g. '2016 · Musical romance · PG-13'"),
-      rating: z.number().min(1).max(5).describe("Critic-style rating, e.g. 4.5"),
+        .describe(
+          "Meta line, e.g. '2016 · Musical romance · PG-13' or 'Luxury EV sedan · From $69,900'"
+        ),
+      rating: z
+        .number()
+        .min(1)
+        .max(5)
+        .optional()
+        .describe("Critic-style rating, e.g. 4.5. Omit if rating fits badly."),
       description: z
         .string()
         .describe("Two evocative sentences about what it is and how it feels"),
@@ -169,7 +190,14 @@ export const sceneTools = {
         .min(2)
         .max(4)
         .describe(
-          "Standout aspects: a famous scene, the soundtrack, best watching mood"
+          "Standout aspects: a famous scene, the soundtrack, killer feature, best use"
+        ),
+      facts: z
+        .array(z.object({ label: z.string(), value: z.string() }))
+        .max(6)
+        .optional()
+        .describe(
+          "Optional quick spec/fact strip, e.g. [{label:'Range', value:'516 mi'}]. Great for products and cars; omit for movies unless useful."
         ),
     }),
     execute: async () => ({ displayed: true }),
@@ -177,7 +205,7 @@ export const sceneTools = {
 
   mediaGrid: tool({
     description:
-      "Show sectioned recommendations of movies, shows, books, music, podcasts or games. Use for 'recommend me a movie/book/...' requests.",
+      "Show sectioned recommendations of movies, shows, books, music, podcasts or games. Use for ALL recommendation/discovery requests, including singular phrasing like 'recommend me a movie' or 'find me something to watch' — always give multiple options across 1-3 themed sections so the user can browse and pick.",
     inputSchema: z.object({
       intro,
       sections: z
@@ -195,6 +223,7 @@ export const sceneTools = {
                     .string()
                     .describe("Micro-summary, e.g. 'Inner-self adventure story'"),
                   tags: z.array(z.string()).max(2),
+                  ask,
                 })
               )
               .min(2)

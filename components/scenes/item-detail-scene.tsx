@@ -10,12 +10,18 @@ import {
 import { RatingStars, TagPills, MetaLine } from "@/components/blocks/inline";
 import type { ScenePartInput } from "./types";
 
-export function MediaDetailScene({
+/**
+ * Generic detail page for any single named thing: a movie, a car, a
+ * gadget, an album. Every drill-down tap ("tell me more about X")
+ * lands here unless the thing is a venue (placeDetail).
+ */
+export function ItemDetailScene({
   input,
 }: {
-  input: ScenePartInput<"mediaDetail">;
+  input: ScenePartInput<"itemDetail">;
 }) {
   const highlights = input?.highlights?.filter(Boolean) ?? [];
+  const facts = input?.facts?.filter(Boolean) ?? [];
   return (
     <SceneShell>
       <SceneIntro text={input?.intro} />
@@ -23,7 +29,7 @@ export function MediaDetailScene({
       {/* Hero band */}
       <div className="mt-4 flex w-full flex-col items-center bg-muted/60 px-6 pb-10 pt-12 text-center">
         <span className="mb-4 text-7xl" aria-hidden>
-          {input?.emoji ?? "🎬"}
+          {input?.emoji ?? "✨"}
         </span>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {input?.title}
@@ -50,6 +56,23 @@ export function MediaDetailScene({
           className="mt-4 justify-center"
         />
       </SceneBand>
+
+      {facts.length > 0 && (
+        <SceneBand>
+          <Stagger className="mx-auto grid w-fit grid-cols-2 gap-x-10 gap-y-4 sm:grid-cols-3">
+            {facts.map((fact, i) => (
+              <StaggerItem key={i} className="text-center">
+                <p className="text-lg font-bold tracking-tight text-foreground">
+                  {fact?.value}
+                </p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {fact?.label}
+                </p>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </SceneBand>
+      )}
 
       {highlights.length > 0 && (
         <SceneBand tone="muted">

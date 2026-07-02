@@ -8,25 +8,24 @@ import {
 } from "@/components/blocks/scene-shell";
 import { SectionHeader } from "@/components/blocks/section-header";
 import { StatCompareRow } from "@/components/blocks/stat-compare-row";
-import { useSceneActions } from "@/components/chat/scene-context";
+import { Tappable } from "@/components/blocks/tappable";
 import type { ScenePartInput } from "./types";
 
 function ItemHeader({
   emoji,
   name,
   subtitle,
+  ask,
 }: {
   emoji?: string;
   name?: string;
   subtitle?: string;
+  ask?: string;
 }) {
-  const { ask } = useSceneActions();
   return (
-    <button
-      type="button"
-      disabled={!name}
-      onClick={() => name && ask(`Tell me more about the ${name}`)}
-      className="group flex flex-col items-center gap-2 text-center"
+    <Tappable
+      ask={ask ?? (name ? `Tell me more about the ${name}` : undefined)}
+      className="flex flex-col items-center gap-2 text-center"
     >
       <div
         className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-200 group-hover:scale-[1.02] group-active:scale-[0.98]"
@@ -42,7 +41,7 @@ function ItemHeader({
           <p className="text-sm text-muted-foreground">{subtitle}</p>
         )}
       </div>
-    </button>
+    </Tappable>
   );
 }
 

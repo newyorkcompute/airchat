@@ -9,7 +9,7 @@ import { SceneRenderer } from "./scene-renderer";
 import { SceneActionsContext } from "./scene-context";
 import { Composer } from "./composer";
 import { SceneSkeleton } from "@/components/blocks/scene-skeleton";
-import { Sparkles, RotateCcw } from "lucide-react";
+import { Sparkles, RotateCcw, ArrowLeft, SquarePen } from "lucide-react";
 
 const SUGGESTIONS = [
   { emoji: "🍣", label: "Best sushi for date night", prompt: "The best sushi spots for a date night tomorrow" },
@@ -18,7 +18,13 @@ const SUGGESTIONS = [
   { emoji: "🎬", label: "Find a movie", prompt: "Recommend me an uplifting movie for tonight" },
 ];
 
-function UserPromptBar({ message }: { message: AirchatUIMessage }) {
+function UserPromptBar({
+  message,
+  onBack,
+}: {
+  message: AirchatUIMessage;
+  onBack?: () => void;
+}) {
   const text = message.parts
     .map((p) => (p.type === "text" ? p.text : ""))
     .join("");
@@ -30,7 +36,23 @@ function UserPromptBar({ message }: { message: AirchatUIMessage }) {
       transition={{ duration: 0.3, ease: "easeOut" }}
       className="sticky top-0 z-20 w-full border-b border-border/50 bg-background/85 backdrop-blur-md"
     >
-      <p className="mx-auto w-full max-w-2xl truncate px-6 py-3.5 pr-16 text-[15px] font-medium text-foreground">
+      {onBack && (
+        <motion.button
+          type="button"
+          aria-label="Back to previous scene"
+          title="Back to previous scene"
+          whileTap={{ scale: 0.9 }}
+          onClick={onBack}
+          className="absolute left-3 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <ArrowLeft className="size-[18px]" aria-hidden />
+        </motion.button>
+      )}
+      <p
+        className={`mx-auto w-full max-w-2xl truncate px-6 py-3.5 pr-16 text-[15px] font-medium text-foreground ${
+          onBack ? "max-[768px]:pl-14" : ""
+        }`}
+      >
         {text}
       </p>
     </motion.div>
@@ -105,29 +127,83 @@ function ErrorScene({ onRetry }: { onRetry: () => void }) {
 }
 
 export function Chat() {
-  const { messages, sendMessage, status, stop, error, regenerate } =
+  const { messages, sendMessage, setMessages, status, stop, error, regenerate } =
     useChat<AirchatUIMessage>({
       transport: new DefaultChatTransport({ api: "/api/chat" }),
     });
 
   const busy = status === "submitted" || status === "streaming";
   const containerRef = useRef<HTMLDivElement>(null);
-  const lastScrolledId = useRef<string | null>(null);
+  const lastScrolledKey = useRef<string | null>(null);
+  const scrollAnim = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // When a new user turn starts, glide the viewport so the new scene takes over.
+  // Native smooth scrolling (and rAF) silently stalls in throttled or
+  // occluded tabs, so we drive the glide with a timer. Re-reading the
+  // element position every tick keeps the target accurate while the
+  // streaming scene grows above/below it.
+  const glideToElement = (el: HTMLElement) => {
+    const stopGlide = () => {
+      if (scrollAnim.current !== null) clearInterval(scrollAnim.current);
+      scrollAnim.current = null;
+      window.removeEventListener("wheel", stopGlide);
+      window.removeEventListener("touchmove", stopGlide);
+    };
+    stopGlide();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.scrollIntoView({ behavior: "instant", block: "start" });
+      return;
+    }
+    const startY = window.scrollY;
+    const startTime = performance.now();
+    const duration = 700;
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+    // Let the user take over: any manual scroll input cancels the glide.
+    window.addEventListener("wheel", stopGlide, { passive: true });
+    window.addEventListener("touchmove", stopGlide, { passive: true });
+    scrollAnim.current = setInterval(() => {
+      const t = Math.min(1, (performance.now() - startTime) / duration);
+      const targetY = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo(0, startY + (targetY - startY) * ease(t));
+      if (t >= 1) stopGlide();
+    }, 16);
+  };
+
+  const glideToTurn = (index: number) => {
+    const turnElements =
+      containerRef.current?.querySelectorAll<HTMLElement>("[data-turn]");
+    const el = turnElements?.[index];
+    if (el) glideToElement(el);
+  };
+
+  const startNewChat = () => {
+    if (busy) stop();
+    setMessages([]);
+    lastScrolledKey.current = null;
+    window.scrollTo(0, 0);
+  };
+
+  // Glide the viewport so the new scene takes over the screen and the
+  // previous turn (with its prompt bar) scrolls fully out of view.
+  // Fires twice per turn: once on send, and again when the assistant's
+  // scene starts streaming in — the second pass corrects any shortfall
+  // from scrolling while the page was still growing.
   const lastUserId = messages.findLast((m) => m.role === "user")?.id;
+  const assistantStarted = messages.at(-1)?.role === "assistant";
+  const scrollKey = lastUserId
+    ? `${lastUserId}:${assistantStarted ? "scene" : "sent"}`
+    : null;
   useEffect(() => {
-    if (!lastUserId || lastScrolledId.current === lastUserId) return;
-    lastScrolledId.current = lastUserId;
-    requestAnimationFrame(() => {
+    if (!scrollKey || lastScrolledKey.current === scrollKey) return;
+    lastScrolledKey.current = scrollKey;
+    // setTimeout instead of rAF: rAF stalls in occluded/background tabs.
+    const timer = setTimeout(() => {
       const turnElements =
-        containerRef.current?.querySelectorAll("[data-turn]");
-      turnElements?.[turnElements.length - 1]?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
-  }, [lastUserId]);
+        containerRef.current?.querySelectorAll<HTMLElement>("[data-turn]");
+      const last = turnElements?.[turnElements.length - 1];
+      if (last) glideToElement(last);
+    }, 30);
+    return () => clearTimeout(timer);
+  }, [scrollKey]);
 
   const turns: { user?: AirchatUIMessage; assistant?: AirchatUIMessage }[] =
     [];
@@ -152,6 +228,24 @@ export function Chat() {
     >
     <div ref={containerRef} className="relative">
       <AnimatePresence>
+        {messages.length > 0 && (
+          <motion.button
+            type="button"
+            aria-label="Start a new chat"
+            title="New chat"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={startNewChat}
+            className="fixed right-13 top-2 z-30 flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <SquarePen className="size-4.5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {messages.length === 0 && (
           <EmptyState onPick={(prompt) => sendMessage({ text: prompt })} />
         )}
@@ -165,7 +259,12 @@ export function Chat() {
             data-turn
             className="border-b border-border/40 last:border-b-0"
           >
-            {turn.user && <UserPromptBar message={turn.user} />}
+            {turn.user && (
+              <UserPromptBar
+                message={turn.user}
+                onBack={i > 0 ? () => glideToTurn(i - 1) : undefined}
+              />
+            )}
             {isLast && error && !busy ? (
               <ErrorScene onRetry={() => regenerate()} />
             ) : turn.assistant ? (

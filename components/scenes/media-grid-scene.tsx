@@ -8,7 +8,7 @@ import {
   StaggerItem,
 } from "@/components/blocks/scene-shell";
 import { TagPills } from "@/components/blocks/inline";
-import { useSceneActions } from "@/components/chat/scene-context";
+import { Tappable } from "@/components/blocks/tappable";
 import type { ScenePartInput } from "./types";
 
 export function MediaGridScene({
@@ -16,7 +16,6 @@ export function MediaGridScene({
 }: {
   input: ScenePartInput<"mediaGrid">;
 }) {
-  const { ask } = useSceneActions();
   const sections = input?.sections?.filter(Boolean) ?? [];
   return (
     <SceneShell>
@@ -29,13 +28,14 @@ export function MediaGridScene({
           <Stagger className="grid grid-cols-2 gap-x-4 gap-y-6">
             {(section?.items?.filter(Boolean) ?? []).map((item, j) => (
               <StaggerItem key={j}>
-                <button
-                  type="button"
-                  disabled={!item?.title}
-                  onClick={() =>
-                    item?.title && ask(`Tell me more about ${item.title}`)
+                <Tappable
+                  ask={
+                    item?.ask ??
+                    (item?.title
+                      ? `Tell me more about ${item.title}`
+                      : undefined)
                   }
-                  className="group w-full text-left"
+                  className="w-full"
                 >
                   <div
                     className="mb-2.5 flex aspect-[4/3] items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-200 group-hover:scale-[1.02] group-active:scale-[0.98]"
@@ -55,7 +55,7 @@ export function MediaGridScene({
                     tags={item?.tags?.filter(Boolean) as string[] | undefined}
                     className="mt-1.5"
                   />
-                </button>
+                </Tappable>
               </StaggerItem>
             ))}
           </Stagger>

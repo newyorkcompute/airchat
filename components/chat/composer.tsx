@@ -96,7 +96,7 @@ export function Composer({
           type="button"
           disabled
           aria-label="Voice input (coming soon)"
-          className="flex size-11 shrink-0 cursor-not-allowed items-center justify-center rounded-full bg-foreground text-background/40 shadow-[0_1px_3px_rgba(0,0,0,0.15),0_8px_20px_-8px_rgba(0,0,0,0.3)]"
+          className="flex size-11 shrink-0 cursor-not-allowed items-center justify-center rounded-full bg-card text-muted-foreground/50 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-border/60"
         >
           <Mic className="size-5" />
         </button>
