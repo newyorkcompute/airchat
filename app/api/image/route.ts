@@ -24,7 +24,15 @@ export async function GET(request: Request) {
     return Response.json({ error: "Image search not configured" }, { status: 503 });
   }
 
-  const q = new URL(request.url).searchParams.get("q")?.trim().slice(0, MAX_QUERY_LENGTH);
+  // Normalize aggressively — every cache layer (memory, Next data cache,
+  // CDN, browser) is keyed by this string, so "Lucid Air  Sedan" and
+  // "lucid air sedan" must be one entry, not two Brave calls.
+  const q = new URL(request.url).searchParams
+    .get("q")
+    ?.trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .slice(0, MAX_QUERY_LENGTH);
   if (!q) {
     return Response.json({ error: "Missing q" }, { status: 400 });
   }
@@ -35,8 +43,7 @@ export async function GET(request: Request) {
     return Response.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  const cacheKey = q.toLowerCase();
-  let url = memoryCache.get(cacheKey);
+  let url = memoryCache.get(q);
 
   if (url === undefined) {
     try {
@@ -47,6 +54,10 @@ export async function GET(request: Request) {
             "X-Subscription-Token": apiKey,
             Accept: "application/json",
           },
+          // Next's persistent data cache: survives cold starts and is
+          // shared across serverless instances, unlike memoryCache. An
+          // image for a query has no freshness needs — cache for 30 days.
+          next: { revalidate: 60 * 60 * 24 * 30 },
         }
       );
       if (!res.ok) throw new Error(`Brave responded ${res.status}`);
@@ -62,7 +73,7 @@ export async function GET(request: Request) {
       // Brave error doesn't stick for the instance's lifetime.
       return Response.json({ url: null }, { status: 200 });
     }
-    memoryCache.set(cacheKey, url);
+    memoryCache.set(q, url);
     if (memoryCache.size > 2_000) {
       memoryCache.delete(memoryCache.keys().next().value as string);
     }
@@ -72,8 +83,10 @@ export async function GET(request: Request) {
     { url },
     {
       headers: {
+        // A query's image never needs to be fresh: 30 days on the CDN,
+        // a day in the browser, serve stale while revalidating.
         "Cache-Control":
-          "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+          "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=2592000",
       },
     }
   );
