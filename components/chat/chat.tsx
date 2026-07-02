@@ -10,7 +10,15 @@ import { SceneRenderer } from "./scene-renderer";
 import { SceneActionsContext } from "./scene-context";
 import { Composer } from "./composer";
 import { SceneSkeleton } from "@/components/blocks/scene-skeleton";
+import { Brand } from "@/components/site/brand";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { TwitterLink } from "@/components/site/twitter-link";
 import { Sparkles, RotateCcw, ArrowLeft, SquarePen } from "lucide-react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 const SUGGESTIONS = [
   { emoji: "🍣", label: "Best sushi for date night", prompt: "The best sushi spots for a date night tomorrow" },
@@ -37,25 +45,29 @@ function UserPromptBar({
       transition={{ duration: 0.3, ease: "easeOut" }}
       className="sticky top-0 z-20 w-full border-b border-border/50 bg-background/85 backdrop-blur-md"
     >
-      {onBack && (
-        <motion.button
-          type="button"
-          aria-label="Back to previous scene"
-          title="Back to previous scene"
-          whileTap={{ scale: 0.9 }}
-          onClick={onBack}
-          className="absolute left-3 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <ArrowLeft className="size-[18px]" aria-hidden />
-        </motion.button>
-      )}
-      <p
-        className={`mx-auto w-full max-w-2xl truncate px-6 py-3.5 pr-16 text-[15px] font-medium text-foreground ${
-          onBack ? "max-[768px]:pl-14" : ""
-        }`}
-      >
-        {text}
-      </p>
+      <div className="mx-auto flex w-full max-w-2xl items-center gap-1.5 px-6 py-3.5 pr-16 max-lg:pr-36 max-md:pl-12">
+        {onBack && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <motion.button
+                  type="button"
+                  aria-label="Back to previous scene"
+                  whileTap={{ scale: 0.9 }}
+                  onClick={onBack}
+                  className="-ml-2 flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <ArrowLeft className="size-[18px]" aria-hidden />
+                </motion.button>
+              }
+            />
+            <TooltipContent side="bottom">Back to previous scene</TooltipContent>
+          </Tooltip>
+        )}
+        <p className="min-w-0 flex-1 truncate text-[15px] font-medium text-foreground">
+          {text}
+        </p>
+      </div>
     </motion.div>
   );
 }
@@ -298,22 +310,37 @@ export function Chat() {
     <SceneActionsContext.Provider value={{ ask, prefetch }}>
     <div ref={containerRef} className="relative">
       <AnimatePresence>
-        {messages.length > 0 && (
-          <motion.button
-            type="button"
-            aria-label="Start a new chat"
-            title="New chat"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={startNewChat}
-            className="fixed right-13 top-2 z-30 flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <SquarePen className="size-4.5" />
-          </motion.button>
-        )}
+        {messages.length > 0 && <Brand key="brand" onClick={startNewChat} />}
       </AnimatePresence>
+
+      <div className="fixed right-3 top-2 z-30 flex items-center gap-1">
+        <TwitterLink />
+        <span aria-hidden className="mx-1 h-4 w-px bg-border/60" />
+        <AnimatePresence initial={false}>
+          {messages.length > 0 && (
+            <Tooltip key="new-chat">
+              <TooltipTrigger
+                render={
+                  <motion.button
+                    type="button"
+                    aria-label="Start a new chat"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={startNewChat}
+                    className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <SquarePen className="size-4.5" />
+                  </motion.button>
+                }
+              />
+              <TooltipContent side="bottom">New chat</TooltipContent>
+            </Tooltip>
+          )}
+        </AnimatePresence>
+        <ThemeToggle />
+      </div>
 
       <AnimatePresence>
         {messages.length === 0 && (

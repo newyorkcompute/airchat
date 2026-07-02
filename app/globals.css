@@ -121,6 +121,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Tailwind preflight resets buttons to cursor: default; restore the
+     pointer affordance on enabled interactive controls. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
   body {
     @apply bg-background text-foreground;
   }

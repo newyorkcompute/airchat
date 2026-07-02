@@ -4,6 +4,11 @@ import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { motion } from "motion/react";
 import { Sun, Moon } from "lucide-react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 const emptySubscribe = () => () => {};
 
@@ -21,14 +26,27 @@ export function ThemeToggle() {
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <motion.button
-      type="button"
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      whileTap={{ scale: 0.9 }}
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="fixed right-3 top-2 z-30 flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-    >
-      {isDark ? <Sun className="size-4.5" /> : <Moon className="size-4.5" />}
-    </motion.button>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <motion.button
+            type="button"
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            {isDark ? (
+              <Sun className="size-4.5" />
+            ) : (
+              <Moon className="size-4.5" />
+            )}
+          </motion.button>
+        }
+      />
+      <TooltipContent side="bottom">
+        {isDark ? "Switch to light mode" : "Switch to dark mode"}
+      </TooltipContent>
+    </Tooltip>
   );
 }

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { TwitterLink } from "@/components/site/twitter-link";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,9 +33,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <ThemeToggle />
-          <TwitterLink />
-          {children}
+          <TooltipProvider delay={300}>{children}</TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

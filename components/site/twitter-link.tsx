@@ -1,3 +1,9 @@
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+
 function XLogo({ className }: { className?: string }) {
   return (
     <svg
@@ -13,15 +19,21 @@ function XLogo({ className }: { className?: string }) {
 
 export function TwitterLink() {
   return (
-    <a
-      href="https://x.com/siddharthkul"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Follow on X"
-      title="Follow on X"
-      className="fixed right-23 top-2 z-30 flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-    >
-      <XLogo className="size-4" />
-    </a>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <a
+            href="https://x.com/siddharthkul"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Follow on X"
+            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <XLogo className="size-4" />
+          </a>
+        }
+      />
+      <TooltipContent side="bottom">Follow on X</TooltipContent>
+    </Tooltip>
   );
 }

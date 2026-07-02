@@ -4,6 +4,11 @@ import { useState, useRef } from "react";
 import { motion } from "motion/react";
 import { ArrowUp, Square, Plus, Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 export function Composer({
   onSend,
@@ -31,14 +36,23 @@ export function Composer({
       <div className="absolute inset-0 -top-10 bg-gradient-to-t from-background via-background/80 to-transparent" />
 
       <div className="pointer-events-auto relative mx-auto flex w-full max-w-2xl items-center gap-3 px-4 pb-5 pt-2">
-        <button
-          type="button"
-          disabled
-          aria-label="Attachments (coming soon)"
-          className="flex size-11 shrink-0 cursor-not-allowed items-center justify-center rounded-full bg-card text-muted-foreground/50 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-border/60"
-        >
-          <Plus className="size-5" />
-        </button>
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              // aria-disabled (not disabled) so hover events still fire
+              // for the tooltip; the button has no click handler anyway.
+              <button
+                type="button"
+                aria-disabled="true"
+                aria-label="Attachments (coming soon)"
+                className="flex size-11 shrink-0 cursor-not-allowed items-center justify-center rounded-full bg-card text-muted-foreground/50 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-border/60"
+              >
+                <Plus className="size-5" />
+              </button>
+            }
+          />
+          <TooltipContent side="top">Attachments — coming soon</TooltipContent>
+        </Tooltip>
 
         <form
           onSubmit={(e) => {
@@ -63,17 +77,24 @@ export function Composer({
             className="h-9 min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground/70"
           />
           {busy ? (
-            <motion.button
-              type="button"
-              onClick={onStop}
-              aria-label="Stop generating"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              whileTap={{ scale: 0.9 }}
-              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background"
-            >
-              <Square className="size-3.5 fill-background" />
-            </motion.button>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <motion.button
+                    type="button"
+                    onClick={onStop}
+                    aria-label="Stop generating"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background"
+                  >
+                    <Square className="size-3.5 fill-background" />
+                  </motion.button>
+                }
+              />
+              <TooltipContent side="top">Stop</TooltipContent>
+            </Tooltip>
           ) : (
             <motion.button
               type="submit"
@@ -92,14 +113,21 @@ export function Composer({
           )}
         </form>
 
-        <button
-          type="button"
-          disabled
-          aria-label="Voice input (coming soon)"
-          className="flex size-11 shrink-0 cursor-not-allowed items-center justify-center rounded-full bg-card text-muted-foreground/50 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-border/60"
-        >
-          <Mic className="size-5" />
-        </button>
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <button
+                type="button"
+                aria-disabled="true"
+                aria-label="Voice input (coming soon)"
+                className="flex size-11 shrink-0 cursor-not-allowed items-center justify-center rounded-full bg-card text-muted-foreground/50 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-border/60"
+              >
+                <Mic className="size-5" />
+              </button>
+            }
+          />
+          <TooltipContent side="top">Voice — coming soon</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
