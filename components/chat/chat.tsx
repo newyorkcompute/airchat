@@ -77,19 +77,24 @@ function UserPromptBar({
 function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
   return (
     <motion.div
-      initial={{ opacity: 0, transform: "translateY(24px)" }}
-      animate={{ opacity: 1, transform: "translateY(0px)" }}
+      // Entrance is CSS (animate-in), not Motion: Motion would inline
+      // `opacity: 0` into the server HTML and hold the whole landing
+      // invisible until hydration — tanking LCP. CSS starts at first
+      // paint. Motion still owns the exit.
+      initial={false}
       exit={{
         opacity: 0,
         transform: "translateY(-24px)",
         // Exit is a system response to the user's send — snap out faster.
         transition: { duration: 0.25, ease: EASE_OUT },
       }}
-      transition={{ duration: 0.4, ease: EASE_OUT }}
       // Overlay, not flow: while this exits, the first turn must already
       // sit at y=0 underneath it. In-flow it would occupy a full viewport,
       // and its unmount would collapse the document and yank the scroll.
-      className="absolute inset-x-0 top-0 z-[15] flex min-h-dvh flex-col items-center bg-background px-6 text-center"
+      // Slide only, no fade: LCP is recorded when the hero's fade would
+      // END, so an opacity entrance here costs ~3s of measured LCP. A
+      // pure transform entrance paints (and scores) at first paint.
+      className="absolute inset-x-0 top-0 z-[15] flex min-h-dvh animate-in flex-col items-center bg-background px-6 text-center duration-500 slide-in-from-bottom-6"
     >
       {/* Hero fills the area above the mid-screen composer (its pill
           center sits at 48dvh — keep these in sync with composer.tsx). */}
@@ -109,13 +114,13 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
         {SUGGESTIONS.map((s, i) => (
           <motion.button
             key={s.label}
-            // Shorthand `y` so the entrance composes with the tap scale.
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: EASE_OUT, delay: 0.1 + i * 0.04 }}
+            // CSS entrance (paints without waiting for hydration — these
+            // chips are the page's LCP element); Motion handles the tap.
+            initial={false}
             whileTap={{ scale: 0.96 }}
             onClick={() => onPick(s.prompt)}
-            className="flex items-center gap-2 rounded-full bg-card px-4 py-2.5 text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_-8px_rgba(0,0,0,0.12)] ring-1 ring-border/60 transition-shadow hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_10px_24px_-8px_rgba(0,0,0,0.18)]"
+            style={{ animationDelay: `${100 + i * 40}ms` }}
+            className="flex animate-in items-center gap-2 rounded-full bg-card fill-mode-backwards px-4 py-2.5 text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_-8px_rgba(0,0,0,0.12)] ring-1 ring-border/60 transition-shadow duration-300 fade-in slide-in-from-bottom-2 hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_10px_24px_-8px_rgba(0,0,0,0.18)]"
           >
             <span aria-hidden>{s.emoji}</span>
             {s.label}
