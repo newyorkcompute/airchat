@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { motion } from "motion/react";
 import { ArrowUp, Square, Plus, Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EASE_OUT } from "@/components/blocks/scene-shell";
 import {
   Tooltip,
   TooltipTrigger,
@@ -84,9 +85,10 @@ export function Composer({
                     type="button"
                     onClick={onStop}
                     aria-label="Stop generating"
-                    initial={{ scale: 0.8, opacity: 0 }}
+                    initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.2, ease: EASE_OUT }}
+                    whileTap={{ scale: 0.95 }}
                     className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background"
                   >
                     <Square className="size-3.5 fill-background" />
@@ -99,7 +101,8 @@ export function Composer({
             <motion.button
               type="submit"
               aria-label="Send"
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.15, ease: EASE_OUT }}
               disabled={!text.trim()}
               className={cn(
                 "flex size-9 shrink-0 items-center justify-center rounded-full transition-colors duration-200",

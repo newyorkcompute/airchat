@@ -34,7 +34,7 @@ function ItemHeader({
         query={imageQuery}
         emoji={emoji}
         fallback="⭐"
-        className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-200 group-hover:scale-[1.02] group-active:scale-[0.98]"
+        className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-150 ease-out-strong group-hover:scale-[1.02] group-active:scale-[0.98]"
       />
       <div>
         <p className="text-base font-bold text-foreground group-hover:underline">

@@ -36,7 +36,7 @@ export function ItemRow({
   const intent = useAskIntent(ask);
   return (
     <StaggerItem
-      className="flex cursor-pointer gap-4 rounded-2xl bg-card p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] ring-1 ring-border/60 transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]"
+      className="flex cursor-pointer gap-4 rounded-2xl bg-card p-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] ring-1 ring-border/60"
       onClick={ask ? () => actions.ask(ask) : undefined}
       role={ask ? "button" : undefined}
       {...intent}

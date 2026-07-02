@@ -38,7 +38,7 @@ export function TextResponseScene({
                   ask={b?.ask}
                   className={`flex w-full items-start gap-3 rounded-2xl bg-muted/60 p-4 ${
                     b?.ask
-                      ? "transition-transform duration-200 hover:scale-[1.01] hover:bg-muted active:scale-[0.99]"
+                      ? "transition-[transform,background-color] duration-150 ease-out-strong hover:scale-[1.01] hover:bg-muted active:scale-[0.99]"
                       : ""
                   }`}
                 >

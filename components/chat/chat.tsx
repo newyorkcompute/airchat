@@ -10,6 +10,7 @@ import { SceneRenderer } from "./scene-renderer";
 import { SceneActionsContext } from "./scene-context";
 import { Composer } from "./composer";
 import { SceneSkeleton } from "@/components/blocks/scene-skeleton";
+import { EASE_OUT } from "@/components/blocks/scene-shell";
 import { Brand } from "@/components/site/brand";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { TwitterLink } from "@/components/site/twitter-link";
@@ -40,9 +41,9 @@ function UserPromptBar({
   if (!text) return null;
   return (
     <motion.div
-      initial={{ opacity: 0, y: -12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      initial={{ opacity: 0, transform: "translateY(-12px)" }}
+      animate={{ opacity: 1, transform: "translateY(0px)" }}
+      transition={{ duration: 0.25, ease: EASE_OUT }}
       className="sticky top-0 z-20 w-full border-b border-border/50 bg-background/85 backdrop-blur-md"
     >
       <div className="mx-auto flex w-full max-w-2xl items-center gap-1.5 px-6 py-3.5 pr-16 max-lg:pr-36 max-md:pl-12">
@@ -53,7 +54,8 @@ function UserPromptBar({
                 <motion.button
                   type="button"
                   aria-label="Back to previous scene"
-                  whileTap={{ scale: 0.9 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.15, ease: EASE_OUT }}
                   onClick={onBack}
                   className="-ml-2 flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
@@ -75,10 +77,15 @@ function UserPromptBar({
 function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -24 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      initial={{ opacity: 0, transform: "translateY(24px)" }}
+      animate={{ opacity: 1, transform: "translateY(0px)" }}
+      exit={{
+        opacity: 0,
+        transform: "translateY(-24px)",
+        // Exit is a system response to the user's send — snap out faster.
+        transition: { duration: 0.25, ease: EASE_OUT },
+      }}
+      transition={{ duration: 0.4, ease: EASE_OUT }}
       className="flex min-h-dvh flex-col items-center justify-center gap-8 px-6 pb-40 text-center"
     >
       <div className="flex flex-col items-center gap-4">
@@ -94,9 +101,13 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
         </p>
       </div>
       <div className="flex max-w-md flex-wrap items-center justify-center gap-2">
-        {SUGGESTIONS.map((s) => (
+        {SUGGESTIONS.map((s, i) => (
           <motion.button
             key={s.label}
+            // Shorthand `y` so the entrance composes with the tap scale.
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: EASE_OUT, delay: 0.1 + i * 0.04 }}
             whileTap={{ scale: 0.96 }}
             onClick={() => onPick(s.prompt)}
             className="flex items-center gap-2 rounded-full bg-card px-4 py-2.5 text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_-8px_rgba(0,0,0,0.12)] ring-1 ring-border/60 transition-shadow hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_10px_24px_-8px_rgba(0,0,0,0.18)]"
@@ -113,8 +124,9 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
 function ErrorScene({ onRetry }: { onRetry: () => void }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, transform: "translateY(16px)" }}
+      animate={{ opacity: 1, transform: "translateY(0px)" }}
+      transition={{ duration: 0.3, ease: EASE_OUT }}
       className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-2xl flex-col items-start gap-4 px-6 py-16"
     >
       <span className="text-4xl" aria-hidden>
@@ -130,7 +142,7 @@ function ErrorScene({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="mt-1 flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-transform active:scale-95"
+        className="mt-1 flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-transform duration-150 ease-out-strong active:scale-[0.97]"
       >
         <RotateCcw className="size-4" aria-hidden />
         Try again
@@ -324,10 +336,15 @@ export function Chat() {
                   <motion.button
                     type="button"
                     aria-label="Start a new chat"
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    whileTap={{ scale: 0.9 }}
+                    exit={{
+                      opacity: 0,
+                      scale: 0.9,
+                      transition: { duration: 0.15, ease: EASE_OUT },
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: EASE_OUT }}
                     onClick={startNewChat}
                     className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >

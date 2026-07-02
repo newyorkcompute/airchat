@@ -42,7 +42,7 @@ export function MediaGridScene({
                     query={item?.imageQuery}
                     emoji={item?.emoji}
                     fallback="🎬"
-                    className="mb-2.5 flex aspect-[4/3] items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-200 group-hover:scale-[1.02] group-active:scale-[0.98]"
+                    className="mb-2.5 flex aspect-[4/3] items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-150 ease-out-strong group-hover:scale-[1.02] group-active:scale-[0.98]"
                   />
                   <p className="text-sm font-bold text-foreground group-hover:underline">
                     {item?.title}

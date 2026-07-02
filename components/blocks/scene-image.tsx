@@ -58,8 +58,10 @@ export function SceneImage({
           loading="lazy"
           onLoad={() => setLoaded(true)}
           className={cn(
-            "absolute inset-0 size-full object-cover transition-opacity duration-500",
-            loaded ? "opacity-100" : "opacity-0"
+            // A touch of blur during the crossfade masks the emoji→photo
+            // swap so it reads as one surface resolving, not two objects.
+            "absolute inset-0 size-full object-cover transition-[opacity,filter] duration-300 ease-out",
+            loaded ? "opacity-100 blur-0" : "opacity-0 blur-sm"
           )}
         />
       )}

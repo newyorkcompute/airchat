@@ -4,8 +4,18 @@ import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**
+ * Strong ease-out for enter/exit motion (mirrors --ease-out-strong in
+ * globals.css). Built-in "easeOut" is too weak to feel intentional.
+ */
+export const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+
+/**
  * Full-bleed scene container. Each assistant turn renders one of these:
- * it fills (at least) the viewport and animates in with a spring rise.
+ * it fills (at least) the viewport and rises into place.
+ *
+ * Animates the full `transform` string (not x/y/scale shorthands) so
+ * Motion can hand it to WAAPI — scenes enter while the response is
+ * still streaming, so the main thread is busy.
  */
 export function SceneShell({
   children,
@@ -16,9 +26,9 @@ export function SceneShell({
 }) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 48, scale: 0.985 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ type: "spring", stiffness: 170, damping: 26, mass: 0.9 }}
+      initial={{ opacity: 0, transform: "translateY(48px) scale(0.985)" }}
+      animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
+      transition={{ duration: 0.5, ease: EASE_OUT }}
       className={cn(
         "relative flex min-h-[calc(100dvh-1rem)] w-full flex-col pb-36",
         className
@@ -34,9 +44,9 @@ export function SceneIntro({ text }: { text?: string }) {
   if (!text) return null;
   return (
     <motion.p
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      initial={{ opacity: 0, transform: "translateY(12px)" }}
+      animate={{ opacity: 1, transform: "translateY(0px)" }}
+      transition={{ duration: 0.35, ease: EASE_OUT }}
       className="mx-auto w-full max-w-2xl px-6 pt-10 pb-2 text-left text-2xl font-semibold leading-snug tracking-tight text-foreground"
     >
       {text}
@@ -81,7 +91,7 @@ export function Stagger({
       animate="show"
       variants={{
         hidden: {},
-        show: { transition: { staggerChildren: 0.07 } },
+        show: { transition: { staggerChildren: 0.05 } },
       }}
       className={className}
     >
@@ -90,12 +100,14 @@ export function Stagger({
   );
 }
 
+// Shorthand `y` (not a full transform string) so it composes with the
+// hover/tap scale gestures on interactive rows.
 export const staggerItem = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 12 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring" as const, stiffness: 220, damping: 24 },
+    transition: { duration: 0.35, ease: EASE_OUT },
   },
 };
 
@@ -124,6 +136,15 @@ export function StaggerItem({
       className={className}
       onClick={onClick}
       role={role}
+      // Motion sets an inline `transform` on this element, which overrides
+      // any CSS hover/active scale — so interactive rows get their
+      // feedback through gestures instead. Motion's hover gesture already
+      // ignores touch-emulated hover.
+      whileHover={onClick ? { scale: 1.01 } : undefined}
+      whileTap={onClick ? { scale: 0.99 } : undefined}
+      transition={
+        onClick ? { duration: 0.15, ease: EASE_OUT } : undefined
+      }
       tabIndex={onClick ? 0 : undefined}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
