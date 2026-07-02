@@ -15,10 +15,14 @@ export function Composer({
   onSend,
   onStop,
   busy,
+  centered = false,
 }: {
   onSend: (text: string) => void;
   onStop: () => void;
   busy: boolean;
+  /** Landing state: float the bar mid-screen; it glides down when the
+   *  conversation starts. */
+  centered?: boolean;
 }) {
   const [text, setText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,9 +36,22 @@ export function Composer({
   };
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20">
+    // The same fixed element serves both states: raised to mid-screen on
+    // the landing page, docked at the bottom in conversation. Animating
+    // one transform makes the first send read as the bar gliding down.
+    <div
+      className={cn(
+        "pointer-events-none fixed inset-x-0 bottom-0 z-20 transition-transform duration-500 ease-out-strong motion-reduce:transition-none",
+        centered && "-translate-y-[calc(55dvh-3rem)]"
+      )}
+    >
       {/* Scrim so scenes fade out behind the bar */}
-      <div className="absolute inset-0 -top-10 bg-gradient-to-t from-background via-background/80 to-transparent" />
+      <div
+        className={cn(
+          "absolute inset-0 -top-10 bg-gradient-to-t from-background via-background/80 to-transparent transition-opacity duration-300",
+          centered && "opacity-0"
+        )}
+      />
 
       {/* One unified pill: + on the left, input, then mic + primary
           action on the right — everything lives inside the bar. */}

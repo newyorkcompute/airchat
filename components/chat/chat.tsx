@@ -86,9 +86,11 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
         transition: { duration: 0.25, ease: EASE_OUT },
       }}
       transition={{ duration: 0.4, ease: EASE_OUT }}
-      className="flex min-h-dvh flex-col items-center justify-center gap-8 px-6 pb-40 text-center"
+      className="flex min-h-dvh flex-col items-center px-6 text-center"
     >
-      <div className="flex flex-col items-center gap-4">
+      {/* Hero fills the area above the mid-screen composer (its pill
+          center sits at 45dvh — keep these in sync with composer.tsx). */}
+      <div className="flex h-[45dvh] flex-col items-center justify-end gap-4 pb-14">
         <div className="flex size-14 items-center justify-center rounded-2xl bg-foreground text-background">
           <Sparkles className="size-7" />
         </div>
@@ -100,7 +102,7 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
           screen.
         </p>
       </div>
-      <div className="flex max-w-md flex-wrap items-center justify-center gap-2">
+      <div className="mt-24 flex max-w-md flex-wrap items-center justify-center gap-2">
         {SUGGESTIONS.map((s, i) => (
           <motion.button
             key={s.label}
@@ -442,6 +444,7 @@ export function Chat() {
 
       <Composer
         busy={busy || injecting}
+        centered={messages.length === 0}
         onStop={stop}
         onSend={(text) => {
           // A typed message invalidates any speculation for tap targets.
