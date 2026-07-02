@@ -1,7 +1,9 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import type { AirchatUIMessage } from "@/lib/ai/tools";
 import { SceneSkeleton } from "@/components/blocks/scene-skeleton";
+import { EASE_OUT } from "@/components/blocks/scene-shell";
 import { RestaurantListScene } from "@/components/scenes/restaurant-list-scene";
 import { PlaceDetailScene } from "@/components/scenes/place-detail-scene";
 import { ComparisonScene } from "@/components/scenes/comparison-scene";
@@ -29,15 +31,41 @@ export function SceneRenderer({ message }: { message: AirchatUIMessage }) {
 function ScenePart({ part }: { part: Part }) {
   if (!part.type.startsWith("tool-")) return null;
 
-  // Show a shimmer until any input has streamed in.
-  if (
+  // Shimmer until any input has streamed in. `popLayout` lifts the
+  // exiting skeleton out of the flow so the scene takes its place
+  // immediately and the shimmer fades out *on top* of it — the swap
+  // reads as the skeleton resolving into content, not a hard cut.
+  const showSkeleton =
     !("input" in part) ||
     part.input == null ||
     (part.state === "input-streaming" &&
-      Object.keys(part.input as object).length === 0)
-  ) {
-    return <SceneSkeleton />;
-  }
+      Object.keys(part.input as object).length === 0);
+
+  return (
+    <div className="relative">
+      <AnimatePresence mode="popLayout" initial={false}>
+        {showSkeleton ? (
+          <motion.div
+            key="skeleton"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
+            className="relative z-10 w-full bg-background"
+          >
+            <SceneSkeleton />
+          </motion.div>
+        ) : (
+          <motion.div key="scene" className="w-full">
+            <SceneBody part={part} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function SceneBody({ part }: { part: Part }) {
+  // Re-narrow to tool parts for TypeScript; ScenePart already gates this.
+  if (!("input" in part)) return null;
 
   if (part.state === "output-error") {
     return (

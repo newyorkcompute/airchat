@@ -160,37 +160,82 @@ export function Chat() {
   const busy = status === "submitted" || status === "streaming";
   const containerRef = useRef<HTMLDivElement>(null);
   const lastScrolledKey = useRef<string | null>(null);
-  const scrollAnim = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stopGlideRef = useRef<(() => void) | null>(null);
+  const busyRef = useRef(false);
 
-  // Native smooth scrolling (and rAF) silently stalls in throttled or
-  // occluded tabs, so we drive the glide with a timer. Re-reading the
-  // element position every tick keeps the target accurate while the
-  // streaming scene grows above/below it.
-  const glideToElement = (el: HTMLElement) => {
-    const stopGlide = () => {
-      if (scrollAnim.current !== null) clearInterval(scrollAnim.current);
-      scrollAnim.current = null;
-      window.removeEventListener("wheel", stopGlide);
-      window.removeEventListener("touchmove", stopGlide);
-    };
-    stopGlide();
+  // The viewport works like a camera: when a new turn starts, it glides
+  // down and keeps the new turn pinned to the top while the scene streams
+  // in and the page grows underneath. Exponential smoothing toward a
+  // re-read target every frame means a moving target (growing content,
+  // restarted glides) never causes a velocity jump — the motion just
+  // keeps easing toward wherever the target is now.
+  const glideToElement = (el: HTMLElement, follow = false) => {
+    stopGlideRef.current?.();
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       el.scrollIntoView({ behavior: "instant", block: "start" });
       return;
     }
-    const startY = window.scrollY;
-    const startTime = performance.now();
-    const duration = 700;
-    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
-    // Let the user take over: any manual scroll input cancels the glide.
+
+    let raf = 0;
+    let watchdog: ReturnType<typeof setInterval> | null = null;
+    let last = performance.now();
+    let lastTick = last;
+    let y = window.scrollY;
+
+    const stopGlide = () => {
+      cancelAnimationFrame(raf);
+      if (watchdog !== null) clearInterval(watchdog);
+      watchdog = null;
+      window.removeEventListener("wheel", stopGlide);
+      window.removeEventListener("touchmove", stopGlide);
+      window.removeEventListener("mousedown", stopGlide);
+      if (stopGlideRef.current === stopGlide) stopGlideRef.current = null;
+    };
+    stopGlideRef.current = stopGlide;
+
+    const tick = (now: number) => {
+      lastTick = now;
+      // Clamp dt so a background-tab stall doesn't teleport on resume.
+      const dt = Math.min(64, now - last);
+      last = now;
+      const maxY =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const target = Math.min(
+        el.getBoundingClientRect().top + window.scrollY,
+        Math.max(0, maxY)
+      );
+      // Frame-rate independent smoothing: ~90% of the remaining distance
+      // is covered every ~300ms.
+      y += (target - y) * (1 - Math.exp(-dt / 130));
+      if (Math.abs(target - y) < 0.5) {
+        y = target;
+        window.scrollTo(0, y);
+        // Keep tracking while the response streams so the turn stays
+        // pinned as content grows; otherwise we're done.
+        if (!(follow && busyRef.current)) stopGlide();
+        return;
+      }
+      window.scrollTo(0, y);
+    };
+
+    const loop = (now: number) => {
+      tick(now);
+      if (stopGlideRef.current === stopGlide)
+        raf = requestAnimationFrame(loop);
+    };
+
+    // Let the user take over: any manual scroll input (wheel, touch,
+    // scrollbar drag) cancels the glide.
     window.addEventListener("wheel", stopGlide, { passive: true });
     window.addEventListener("touchmove", stopGlide, { passive: true });
-    scrollAnim.current = setInterval(() => {
-      const t = Math.min(1, (performance.now() - startTime) / duration);
-      const targetY = el.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo(0, startY + (targetY - startY) * ease(t));
-      if (t >= 1) stopGlide();
-    }, 16);
+    window.addEventListener("mousedown", stopGlide, { passive: true });
+    raf = requestAnimationFrame(loop);
+    // rAF stalls in occluded/background tabs; a coarse timer keeps the
+    // scroll position correct there (smoothness is invisible anyway).
+    watchdog = setInterval(() => {
+      const now = performance.now();
+      if (now - lastTick > 100) tick(now);
+    }, 125);
   };
 
   const glideToTurn = (index: number) => {
@@ -277,16 +322,21 @@ export function Chat() {
   const startNewChat = () => {
     if (busy) stop();
     clearPrefetches();
+    stopGlideRef.current?.();
     setMessages([]);
     lastScrolledKey.current = null;
     window.scrollTo(0, 0);
   };
 
+  // The follow loop reads this to know when the stream has finished.
+  useEffect(() => {
+    busyRef.current = busy || injecting;
+  }, [busy, injecting]);
+
   // Glide the viewport so the new scene takes over the screen and the
   // previous turn (with its prompt bar) scrolls fully out of view.
-  // Fires twice per turn: once on send, and again when the assistant's
-  // scene starts streaming in — the second pass corrects any shortfall
-  // from scrolling while the page was still growing.
+  // Fires on send and again when the assistant's scene starts streaming;
+  // `follow` keeps the turn pinned while the page grows underneath.
   const lastUserId = messages.findLast((m) => m.role === "user")?.id;
   const assistantStarted = messages.at(-1)?.role === "assistant";
   const scrollKey = lastUserId
@@ -300,7 +350,7 @@ export function Chat() {
       const turnElements =
         containerRef.current?.querySelectorAll<HTMLElement>("[data-turn]");
       const last = turnElements?.[turnElements.length - 1];
-      if (last) glideToElement(last);
+      if (last) glideToElement(last, true);
     }, 30);
     return () => clearTimeout(timer);
   }, [scrollKey]);

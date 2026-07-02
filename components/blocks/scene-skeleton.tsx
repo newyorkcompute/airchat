@@ -1,5 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Anchor the pulse phase to the document clock so skeleton handoffs
+// (chat-level placeholder → scene-level placeholder) don't visibly
+// reset the shimmer mid-pulse. Done in a ref callback (commit phase,
+// before paint) since reading the clock during render is impure.
+const anchorPulse = (el: HTMLDivElement | null) => {
+  el?.style.setProperty(
+    "--pulse-delay",
+    `${-(performance.now() % 1200)}ms`
+  );
+};
+
 /**
  * Shimmer placeholder shown while a scene's data is still streaming in.
  *
@@ -12,7 +23,10 @@ export function SceneSkeleton() {
   return (
     // Faster pulse than the 2s default — quicker loading indicators make
     // the wait feel shorter (perceived performance).
-    <div className="mx-auto min-h-[calc(100dvh-3.5rem)] w-full max-w-2xl space-y-6 px-6 pt-10 [&_[data-slot=skeleton]]:[animation-duration:1.2s]">
+    <div
+      ref={anchorPulse}
+      className="mx-auto min-h-[calc(100dvh-3.5rem)] w-full max-w-2xl space-y-6 px-6 pt-10 [&_[data-slot=skeleton]]:[animation-delay:var(--pulse-delay,0ms)] [&_[data-slot=skeleton]]:[animation-duration:1.2s]"
+    >
       <div className="space-y-2">
         <Skeleton className="h-7 w-4/5 rounded-lg" />
         <Skeleton className="h-7 w-3/5 rounded-lg" />
