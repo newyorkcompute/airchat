@@ -42,7 +42,7 @@ export function Composer({
     <div
       className={cn(
         "pointer-events-none fixed inset-x-0 bottom-0 z-20 transition-transform duration-500 ease-out-strong motion-reduce:transition-none",
-        centered && "-translate-y-[calc(55dvh-3rem)]"
+        centered && "-translate-y-[calc(52dvh-3rem)]"
       )}
     >
       {/* Scrim so scenes fade out behind the bar */}
@@ -54,8 +54,14 @@ export function Composer({
       />
 
       {/* One unified pill: + on the left, input, then mic + primary
-          action on the right — everything lives inside the bar. */}
-      <div className="pointer-events-auto relative mx-auto w-full max-w-2xl px-4 pb-5 pt-2">
+          action on the right — everything lives inside the bar. Slightly
+          narrower while centered on the landing; grows as it docks. */}
+      <div
+        className={cn(
+          "pointer-events-auto relative mx-auto w-full px-4 pb-5 pt-2 transition-[max-width] duration-500 ease-out-strong motion-reduce:transition-none",
+          centered ? "max-w-xl" : "max-w-2xl"
+        )}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();

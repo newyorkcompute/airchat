@@ -92,20 +92,20 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
       className="absolute inset-x-0 top-0 z-[15] flex min-h-dvh flex-col items-center bg-background px-6 text-center"
     >
       {/* Hero fills the area above the mid-screen composer (its pill
-          center sits at 45dvh — keep these in sync with composer.tsx). */}
-      <div className="flex h-[45dvh] flex-col items-center justify-end gap-4 pb-14">
+          center sits at 48dvh — keep these in sync with composer.tsx). */}
+      <div className="flex h-[48dvh] flex-col items-center justify-end gap-4 pb-12">
         <div className="flex size-14 items-center justify-center rounded-2xl bg-foreground text-background">
           <Sparkles className="size-7" />
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-foreground">
           airchat
         </h1>
-        <p className="max-w-xs text-balance text-muted-foreground">
+        <p className="max-w-sm text-balance text-muted-foreground">
           AI with a visual interface. Ask anything — the answer is a whole new
           screen.
         </p>
       </div>
-      <div className="mt-24 flex max-w-md flex-wrap items-center justify-center gap-2">
+      <div className="mt-16 flex max-w-md flex-wrap items-center justify-center gap-2">
         {SUGGESTIONS.map((s, i) => (
           <motion.button
             key={s.label}
