@@ -1,0 +1,42 @@
+name: Feature request
+description: Suggest an idea for Airchat
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What are you trying to do? What's missing today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like it to work?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New scene type
+        - Existing scenes / UI
+        - Chat / navigation
+        - Images / performance
+        - Auth / persistence
+        - Docs / DX
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contrib
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd be willing to open a PR for this
+          required: false

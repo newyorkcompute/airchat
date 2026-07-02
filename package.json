@@ -2,6 +2,17 @@
   "name": "airchat",
   "version": "0.1.0",
   "private": true,
+  "description": "Generative-UI chat — every answer is a full-screen interactive scene",
+  "license": "MIT",
+  "author": "Siddharth Kulkarni (https://x.com/siddharthkul)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/newyorkcompute/airchat.git"
+  },
+  "homepage": "https://useairchat.vercel.app",
+  "bugs": {
+    "url": "https://github.com/newyorkcompute/airchat/issues"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
