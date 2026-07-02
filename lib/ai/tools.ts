@@ -246,7 +246,17 @@ export const sceneTools = {
         .string()
         .describe("2-4 plain-prose sentences answering the question"),
       bullets: z
-        .array(z.object({ emoji, text: z.string() }))
+        .array(
+          z.object({
+            emoji,
+            text: z.string(),
+            ask: ask
+              .optional()
+              .describe(
+                "Include ONLY if the bullet is a suggestion the user could act on (e.g. 'Find restaurants or cafes' → ask: 'Find me some great restaurants nearby'). Omit for purely informational points."
+              ),
+          })
+        )
         .max(6)
         .describe("Optional key points; empty array if not needed"),
     }),

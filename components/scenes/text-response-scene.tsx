@@ -7,6 +7,7 @@ import {
   Stagger,
   StaggerItem,
 } from "@/components/blocks/scene-shell";
+import { Tappable } from "@/components/blocks/tappable";
 import type { ScenePartInput } from "./types";
 
 export function TextResponseScene({
@@ -32,16 +33,22 @@ export function TextResponseScene({
         {bullets.length > 0 && (
           <Stagger className="mt-6 space-y-3">
             {bullets.map((b, i) => (
-              <StaggerItem
-                key={i}
-                className="flex items-start gap-3 rounded-2xl bg-muted/60 p-4"
-              >
-                <span className="text-xl" aria-hidden>
-                  {b?.emoji ?? "•"}
-                </span>
-                <p className="pt-0.5 text-sm leading-snug text-foreground">
-                  {b?.text}
-                </p>
+              <StaggerItem key={i}>
+                <Tappable
+                  ask={b?.ask}
+                  className={`flex w-full items-start gap-3 rounded-2xl bg-muted/60 p-4 ${
+                    b?.ask
+                      ? "transition-transform duration-200 hover:scale-[1.01] hover:bg-muted active:scale-[0.99]"
+                      : ""
+                  }`}
+                >
+                  <span className="text-xl" aria-hidden>
+                    {b?.emoji ?? "•"}
+                  </span>
+                  <p className="pt-0.5 text-sm leading-snug text-foreground">
+                    {b?.text}
+                  </p>
+                </Tappable>
               </StaggerItem>
             ))}
           </Stagger>
