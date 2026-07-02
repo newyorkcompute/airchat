@@ -48,7 +48,7 @@ export function Composer({
       {/* Scrim so scenes fade out behind the bar */}
       <div
         className={cn(
-          "absolute inset-0 -top-10 bg-gradient-to-t from-background via-background/80 to-transparent transition-opacity duration-300",
+          "absolute inset-0 -top-10 bg-gradient-to-t from-background/70 via-background/35 to-transparent transition-opacity duration-300",
           centered && "opacity-0"
         )}
       />
@@ -67,7 +67,7 @@ export function Composer({
             e.preventDefault();
             submit();
           }}
-          className="flex items-center gap-1 rounded-full bg-card py-2 pl-2 pr-2 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_20px_-8px_rgba(0,0,0,0.15)] ring-1 ring-border/60 transition-shadow focus-within:shadow-[0_1px_3px_rgba(0,0,0,0.1),0_12px_28px_-8px_rgba(0,0,0,0.22)] focus-within:ring-ring/40"
+          className="glass flex items-center gap-1 rounded-full py-2 pl-2 pr-2 transition-shadow focus-within:shadow-[0_1px_3px_rgba(0,0,0,0.08),0_12px_28px_-8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.55)] focus-within:ring-1 focus-within:ring-ring/30 dark:focus-within:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_12px_28px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)]"
         >
           <Tooltip>
             <TooltipTrigger
@@ -78,7 +78,7 @@ export function Composer({
                   type="button"
                   aria-disabled="true"
                   aria-label="Attachments (coming soon)"
-                  className="flex size-9 shrink-0 cursor-not-allowed items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-muted"
+                  className="flex size-9 shrink-0 cursor-not-allowed items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-foreground/5 dark:hover:bg-white/10"
                 >
                   <Plus className="size-5" />
                 </button>
@@ -112,7 +112,7 @@ export function Composer({
                   type="button"
                   aria-disabled="true"
                   aria-label="Voice input (coming soon)"
-                  className="flex size-9 shrink-0 cursor-not-allowed items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-muted"
+                  className="flex size-9 shrink-0 cursor-not-allowed items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:bg-foreground/5 dark:hover:bg-white/10"
                 >
                   <Mic className="size-5" />
                 </button>

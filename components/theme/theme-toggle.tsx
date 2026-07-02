@@ -35,7 +35,7 @@ export function ThemeToggle() {
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/10"
           >
             {isDark ? (
               <Sun className="size-4.5" />

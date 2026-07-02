@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
+import { cn } from "@/lib/utils";
 import type { AirchatUIMessage } from "@/lib/ai/tools";
 import { prefetchAssistantMessage, makeUserMessage } from "@/lib/prefetch";
 import { SceneRenderer } from "./scene-renderer";
@@ -12,9 +13,10 @@ import { Composer } from "./composer";
 import { SceneSkeleton } from "@/components/blocks/scene-skeleton";
 import { EASE_OUT } from "@/components/blocks/scene-shell";
 import { Brand } from "@/components/site/brand";
+import { AboutDialog } from "@/components/site/about-dialog";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { TwitterLink } from "@/components/site/twitter-link";
-import { Sparkles, RotateCcw, ArrowLeft, SquarePen } from "lucide-react";
+import { Sparkles, RotateCcw, ArrowLeft, SquarePen, Info } from "lucide-react";
 import {
   Tooltip,
   TooltipTrigger,
@@ -40,13 +42,20 @@ function UserPromptBar({
     .join("");
   if (!text) return null;
   return (
+    // Floating pill, not a full-width band: it stays clear of the brand
+    // and icon capsules so scene content visibly slides underneath.
     <motion.div
       initial={{ opacity: 0, transform: "translateY(-12px)" }}
       animate={{ opacity: 1, transform: "translateY(0px)" }}
       transition={{ duration: 0.25, ease: EASE_OUT }}
-      className="sticky top-0 z-20 w-full border-b border-border/50 bg-background/85 backdrop-blur-md"
+      className="sticky top-2 z-20 mx-auto w-fit max-w-[min(34rem,calc(100%-18rem))] max-md:max-w-[calc(100%-11rem)]"
     >
-      <div className="mx-auto flex w-full max-w-2xl items-center gap-1.5 px-6 py-3.5 pr-16 max-lg:pr-36 max-md:pl-12">
+      <div
+        className={cn(
+          "glass flex h-10 items-center gap-1 rounded-full pr-4",
+          onBack ? "pl-1.5" : "pl-4"
+        )}
+      >
         {onBack && (
           <Tooltip>
             <TooltipTrigger
@@ -57,16 +66,16 @@ function UserPromptBar({
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.15, ease: EASE_OUT }}
                   onClick={onBack}
-                  className="-ml-2 flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/10"
                 >
-                  <ArrowLeft className="size-[18px]" aria-hidden />
+                  <ArrowLeft className="size-4" aria-hidden />
                 </motion.button>
               }
             />
             <TooltipContent side="bottom">Back to previous scene</TooltipContent>
           </Tooltip>
         )}
-        <p className="min-w-0 flex-1 truncate text-[15px] font-medium text-foreground">
+        <p className="min-w-0 truncate text-sm font-medium text-foreground">
           {text}
         </p>
       </div>
@@ -103,7 +112,7 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
           <Sparkles className="size-7" />
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          airchat
+          Airchat
         </h1>
         <p className="max-w-sm text-balance text-muted-foreground">
           AI with a visual interface. Ask anything — the answer is a whole new
@@ -120,7 +129,7 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
             whileTap={{ scale: 0.96 }}
             onClick={() => onPick(s.prompt)}
             style={{ animationDelay: `${100 + i * 40}ms` }}
-            className="flex animate-in items-center gap-2 rounded-full bg-card fill-mode-backwards px-4 py-2.5 text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_-8px_rgba(0,0,0,0.12)] ring-1 ring-border/60 transition-shadow duration-300 fade-in slide-in-from-bottom-2 hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_10px_24px_-8px_rgba(0,0,0,0.18)]"
+            className="glass-subtle flex animate-in items-center gap-2 rounded-full fill-mode-backwards px-4 py-2.5 text-sm font-medium text-foreground transition-shadow duration-300 fade-in slide-in-from-bottom-2 hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_10px_24px_-8px_rgba(0,0,0,0.16)] dark:hover:shadow-[0_2px_6px_rgba(0,0,0,0.25),0_10px_24px_-8px_rgba(0,0,0,0.4)]"
           >
             <span aria-hidden>{s.emoji}</span>
             {s.label}
@@ -168,6 +177,7 @@ export function Chat() {
     });
 
   const busy = status === "submitted" || status === "streaming";
+  const [aboutOpen, setAboutOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastScrolledKey = useRef<string | null>(null);
   const stopGlideRef = useRef<(() => void) | null>(null);
@@ -385,37 +395,61 @@ export function Chat() {
         {messages.length > 0 && <Brand key="brand" onClick={startNewChat} />}
       </AnimatePresence>
 
-      <div className="fixed right-3 top-2 z-30 flex items-center gap-1">
+      <div className="glass fixed right-3 top-2 z-30 flex h-10 items-center gap-0.5 rounded-full px-1">
         <TwitterLink />
-        <span aria-hidden className="mx-1 h-4 w-px bg-border/60" />
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <button
+                type="button"
+                aria-label="About Airchat"
+                onClick={() => setAboutOpen(true)}
+                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/10"
+              >
+                <Info className="size-4" />
+              </button>
+            }
+          />
+          <TooltipContent side="bottom">About Airchat</TooltipContent>
+        </Tooltip>
         <AnimatePresence initial={false}>
           {messages.length > 0 && (
-            <Tooltip key="new-chat">
-              <TooltipTrigger
-                render={
-                  <motion.button
-                    type="button"
-                    aria-label="Start a new chat"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{
-                      opacity: 0,
-                      scale: 0.9,
-                      transition: { duration: 0.15, ease: EASE_OUT },
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: EASE_OUT }}
-                    onClick={startNewChat}
-                    className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <SquarePen className="size-4.5" />
-                  </motion.button>
-                }
+            <>
+              <span
+                aria-hidden
+                className="mx-0.5 h-4 w-px bg-foreground/10 dark:bg-white/15"
               />
-              <TooltipContent side="bottom">New chat</TooltipContent>
-            </Tooltip>
+              <Tooltip key="new-chat">
+                <TooltipTrigger
+                  render={
+                    <motion.button
+                      type="button"
+                      aria-label="Start a new chat"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{
+                        opacity: 0,
+                        scale: 0.9,
+                        transition: { duration: 0.15, ease: EASE_OUT },
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: EASE_OUT }}
+                      onClick={startNewChat}
+                      className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/10"
+                    >
+                      <SquarePen className="size-4" />
+                    </motion.button>
+                  }
+                />
+                <TooltipContent side="bottom">New chat</TooltipContent>
+              </Tooltip>
+            </>
           )}
         </AnimatePresence>
+        <span
+          aria-hidden
+          className="mx-0.5 h-4 w-px bg-foreground/10 dark:bg-white/15"
+        />
         <ThemeToggle />
       </div>
 
@@ -449,6 +483,8 @@ export function Chat() {
           </div>
         );
       })}
+
+      <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
 
       <Composer
         busy={busy || injecting}

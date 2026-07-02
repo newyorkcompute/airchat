@@ -4,7 +4,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 
-function XLogo({ className }: { className?: string }) {
+export function XLogo({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -27,7 +27,7 @@ export function TwitterLink() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Follow on X"
-            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/10"
           >
             <XLogo className="size-4" />
           </a>
