@@ -33,9 +33,11 @@ const SUGGESTIONS = [
 function UserPromptBar({
   message,
   onBack,
+  sticky = true,
 }: {
   message: AirchatUIMessage;
   onBack?: () => void;
+  sticky?: boolean;
 }) {
   const text = message.parts
     .map((p) => (p.type === "text" ? p.text : ""))
@@ -48,7 +50,10 @@ function UserPromptBar({
       initial={{ opacity: 0, transform: "translateY(-12px)" }}
       animate={{ opacity: 1, transform: "translateY(0px)" }}
       transition={{ duration: 0.25, ease: EASE_OUT }}
-      className="sticky top-2 z-20 mx-auto w-fit max-w-[min(34rem,calc(100%-18rem))] max-md:max-w-[calc(100%-11rem)]"
+      className={cn(
+        "mx-auto w-fit max-w-[min(34rem,calc(100%-18rem))] max-md:max-w-[calc(100%-11rem)]",
+        sticky && "sticky top-2 z-20"
+      )}
     >
       <div
         className={cn(
@@ -471,6 +476,7 @@ export function Chat() {
               <UserPromptBar
                 message={turn.user}
                 onBack={i > 0 ? () => glideToTurn(i - 1) : undefined}
+                sticky={isLast}
               />
             )}
             {isLast && error && !busy ? (
