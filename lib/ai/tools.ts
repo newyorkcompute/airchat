@@ -102,12 +102,14 @@ export const sceneTools = {
         name: z.string(),
         subtitle: z.string().describe("e.g. 'From $70,000'"),
         ask,
+        imageQuery,
       }),
       itemB: z.object({
         emoji,
         name: z.string(),
         subtitle: z.string(),
         ask,
+        imageQuery,
       }),
       sections: z
         .array(
@@ -184,6 +186,7 @@ export const sceneTools = {
       intro,
       emoji,
       title: z.string(),
+      imageQuery,
       subtitle: z
         .string()
         .describe(
@@ -238,6 +241,7 @@ export const sceneTools = {
                     .describe("Micro-summary, e.g. 'Inner-self adventure story'"),
                   tags: z.array(z.string()).max(2),
                   ask,
+                  imageQuery,
                 })
               )
               .min(2)

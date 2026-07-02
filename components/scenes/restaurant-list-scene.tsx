@@ -41,6 +41,7 @@ export function RestaurantListScene({
                 place?.ask ??
                 (place?.name ? `Tell me more about ${place.name}` : undefined)
               }
+              imageQuery={place?.imageQuery}
             />
           ))}
         </Stagger>

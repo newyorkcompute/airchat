@@ -9,6 +9,7 @@ import {
 } from "@/components/blocks/scene-shell";
 import { TagPills } from "@/components/blocks/inline";
 import { Tappable } from "@/components/blocks/tappable";
+import { SceneImage } from "@/components/blocks/scene-image";
 import type { ScenePartInput } from "./types";
 
 export function MediaGridScene({
@@ -37,12 +38,12 @@ export function MediaGridScene({
                   }
                   className="w-full"
                 >
-                  <div
+                  <SceneImage
+                    query={item?.imageQuery}
+                    emoji={item?.emoji}
+                    fallback="🎬"
                     className="mb-2.5 flex aspect-[4/3] items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-200 group-hover:scale-[1.02] group-active:scale-[0.98]"
-                    aria-hidden
-                  >
-                    {item?.emoji ?? "🎬"}
-                  </div>
+                  />
                   <p className="text-sm font-bold text-foreground group-hover:underline">
                     {item?.title}
                   </p>

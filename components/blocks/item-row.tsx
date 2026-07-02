@@ -2,6 +2,7 @@
 
 import { StaggerItem } from "./scene-shell";
 import { RatingStars, PriceLevel, TagPills } from "./inline";
+import { SceneImage } from "./scene-image";
 import { useAskIntent } from "./tappable";
 import { useSceneActions } from "@/components/chat/scene-context";
 
@@ -19,6 +20,7 @@ export function ItemRow({
   blurb,
   tags,
   ask,
+  imageQuery,
 }: {
   emoji?: string;
   name?: string;
@@ -28,6 +30,7 @@ export function ItemRow({
   blurb?: string;
   tags?: string[];
   ask?: string;
+  imageQuery?: string;
 }) {
   const actions = useSceneActions();
   const intent = useAskIntent(ask);
@@ -38,12 +41,12 @@ export function ItemRow({
       role={ask ? "button" : undefined}
       {...intent}
     >
-      <div
+      <SceneImage
+        query={imageQuery}
+        emoji={emoji}
+        fallback="📍"
         className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-muted text-3xl"
-        aria-hidden
-      >
-        {emoji ?? "📍"}
-      </div>
+      />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
           <p className="truncate text-base font-bold text-foreground">

@@ -9,6 +9,7 @@ import {
 import { SectionHeader } from "@/components/blocks/section-header";
 import { StatCompareRow } from "@/components/blocks/stat-compare-row";
 import { Tappable } from "@/components/blocks/tappable";
+import { SceneImage } from "@/components/blocks/scene-image";
 import type { ScenePartInput } from "./types";
 
 function ItemHeader({
@@ -16,23 +17,25 @@ function ItemHeader({
   name,
   subtitle,
   ask,
+  imageQuery,
 }: {
   emoji?: string;
   name?: string;
   subtitle?: string;
   ask?: string;
+  imageQuery?: string;
 }) {
   return (
     <Tappable
       ask={ask ?? (name ? `Tell me more about the ${name}` : undefined)}
       className="flex flex-col items-center gap-2 text-center"
     >
-      <div
+      <SceneImage
+        query={imageQuery}
+        emoji={emoji}
+        fallback="⭐"
         className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-muted text-6xl transition-transform duration-200 group-hover:scale-[1.02] group-active:scale-[0.98]"
-        aria-hidden
-      >
-        {emoji ?? "⭐"}
-      </div>
+      />
       <div>
         <p className="text-base font-bold text-foreground group-hover:underline">
           {name}

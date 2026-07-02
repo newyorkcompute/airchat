@@ -8,6 +8,7 @@ import {
   StaggerItem,
 } from "@/components/blocks/scene-shell";
 import { RatingStars, PriceLevel, TagPills, MetaLine } from "@/components/blocks/inline";
+import { SceneImage } from "@/components/blocks/scene-image";
 import type { ScenePartInput } from "./types";
 
 export function PlaceDetailScene({
@@ -22,9 +23,12 @@ export function PlaceDetailScene({
 
       {/* Hero band */}
       <div className="mt-4 flex w-full flex-col items-center bg-muted/60 px-6 pb-10 pt-12 text-center">
-        <span className="mb-4 text-7xl" aria-hidden>
-          {input?.emoji ?? "📍"}
-        </span>
+        <SceneImage
+          query={input?.imageQuery}
+          emoji={input?.emoji}
+          fallback="📍"
+          className="mb-4 flex h-48 w-full max-w-sm items-center justify-center rounded-3xl bg-muted text-7xl shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_40px_-20px_rgba(0,0,0,0.25)]"
+        />
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {input?.name}
         </h1>
