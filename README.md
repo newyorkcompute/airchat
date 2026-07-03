@@ -94,12 +94,6 @@ Inputs stream in partially — every field may be `undefined` mid-stream; scenes
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for how scene rendering, the design system, and model routing work (with diagrams). [AGENTS.md](./AGENTS.md) covers coding conventions; [CONTRIBUTING.md](./CONTRIBUTING.md) for how to add a scene.
 
-## Roadmap
-
-- Auth + stronger rate limiting for public deploys
-- Conversation persistence (Postgres / Neon)
-- Voice input
-
 ## License
 
 [MIT](./LICENSE) © [newyorkcompute](https://github.com/newyorkcompute)
