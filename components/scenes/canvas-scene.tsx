@@ -17,7 +17,7 @@ type Item = NonNullable<NonNullable<Section["items"]>[number]>;
 
 /**
  * The model-composed scene: an ordered list of typed sections, each
- * rendered by a small dedicated block. The model is the designer here —
+ * rendered by a small dedicated block. The model is the designer here  - 
  * this component just gives every section kind a high-quality rendering
  * and keeps the band rhythm (alternating tones) consistent.
  */
@@ -226,7 +226,7 @@ function SectionBody({ section }: { section: Section }) {
           </blockquote>
           {items[0]?.label && (
             <figcaption className="mt-3 text-sm text-muted-foreground">
-              — {items[0].label}
+              - {items[0].label}
             </figcaption>
           )}
         </figure>

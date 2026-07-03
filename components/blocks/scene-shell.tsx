@@ -14,7 +14,7 @@ export const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
  * it fills (at least) the viewport and rises into place.
  *
  * Animates the full `transform` string (not x/y/scale shorthands) so
- * Motion can hand it to WAAPI — scenes enter while the response is
+ * Motion can hand it to WAAPI - scenes enter while the response is
  * still streaming, so the main thread is busy.
  */
 export function SceneShell({
@@ -26,7 +26,7 @@ export function SceneShell({
 }) {
   return (
     <motion.section
-      // Opacity only — a transform on this wrapper would break
+      // Opacity only - a transform on this wrapper would break
       // `position: sticky` for any descendant that needs it.
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -139,7 +139,7 @@ export function StaggerItem({
       onClick={onClick}
       role={role}
       // Motion sets an inline `transform` on this element, which overrides
-      // any CSS hover/active scale — so interactive rows get their
+      // any CSS hover/active scale - so interactive rows get their
       // feedback through gestures instead. Motion's hover gesture already
       // ignores touch-emulated hover.
       whileHover={onClick ? { scale: 1.01 } : undefined}

@@ -46,7 +46,7 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  /* Strong ease-out for UI motion — built-in `ease-out` is too weak. */
+  /* Strong ease-out for UI motion - built-in `ease-out` is too weak. */
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
@@ -120,7 +120,7 @@
 }
 
 @layer utilities {
-  /* Liquid-glass surfaces — translucent fill, blur, hairline edge, top highlight. */
+  /* Liquid-glass surfaces - translucent fill, blur, hairline edge, top highlight. */
   .glass {
     @apply border border-black/[0.06] bg-white/65 backdrop-blur-xl backdrop-saturate-150;
     box-shadow:

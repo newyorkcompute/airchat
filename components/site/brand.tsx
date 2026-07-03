@@ -15,7 +15,7 @@ export function Brand({ onClick }: { onClick: () => void }) {
         render={
           <motion.button
             type="button"
-            aria-label="Airchat — start a new chat"
+            aria-label="Airchat - start a new chat"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.15, ease: "easeOut" } }}

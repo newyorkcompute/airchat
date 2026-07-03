@@ -8,7 +8,7 @@ type DeepPartial<T> = T extends (infer U)[]
 
 /**
  * Tool input as seen by scene components. While the tool call streams,
- * the input is deeply partial — every field may still be undefined.
+ * the input is deeply partial. Every field may still be undefined.
  */
 export type ScenePartInput<K extends SceneToolName> =
   | DeepPartial<SceneTools[K]["input"]>

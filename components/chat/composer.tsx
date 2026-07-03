@@ -54,7 +54,7 @@ export function Composer({
       />
 
       {/* One unified pill: + on the left, input, then mic + primary
-          action on the right — everything lives inside the bar. Slightly
+          action on the right - everything lives inside the bar. Slightly
           narrower while centered on the landing; grows as it docks. */}
       <div
         className={cn(
@@ -85,7 +85,7 @@ export function Composer({
               }
             />
             <TooltipContent side="top">
-              Attachments — coming soon
+              Attachments - coming soon
             </TooltipContent>
           </Tooltip>
 
@@ -118,7 +118,7 @@ export function Composer({
                 </button>
               }
             />
-            <TooltipContent side="top">Voice — coming soon</TooltipContent>
+            <TooltipContent side="top">Voice - coming soon</TooltipContent>
           </Tooltip>
 
           {busy ? (

@@ -9,7 +9,7 @@ Live demo: [useairchat.vercel.app](https://useairchat.vercel.app)
 ## TL;DR
 
 - The model **never returns markdown**. Every turn is **exactly one tool call**.
-- The tool's **JSON input is the UI** — it streams field-by-field to the client.
+- The tool's **JSON input is the UI** - it streams field-by-field to the client.
 - React **scene components** render that data using a shared **block** design system.
 - The model **chooses among predefined scene types** (and composes `canvas` sections); it does not generate arbitrary JSX at runtime.
 
@@ -44,7 +44,7 @@ sequenceDiagram
 | Setting | Effect |
 | --- | --- |
 | `tools: sceneTools` | All scene schemas from `lib/ai/tools.ts` |
-| `toolChoice: "required"` | Model must call a tool — no plain-text replies |
+| `toolChoice: "required"` | Model must call a tool - no plain-text replies |
 | `stopWhen: stepCountIs(1)` | One tool call per turn, then stop |
 | `execute: async () => ({ displayed: true })` | Tools are UI schemas, not server actions |
 
@@ -55,7 +55,7 @@ Rate limiting runs per IP before the model is called (`lib/rate-limit.ts`).
 - **`useChat`** receives streaming tool input.
 - **`scene-renderer.tsx`** maps `tool-*` part types to scene components.
 - **`SceneActionsContext`** exposes `ask()` and `prefetch()` for tappable drill-down.
-- **Scroll camera** in `chat.tsx` glides each new turn to fill the viewport (custom rAF smoothing — not `scrollIntoView`).
+- **Scroll camera** in `chat.tsx` glides each new turn to fill the viewport (custom rAF smoothing - not `scrollIntoView`).
 
 ---
 
@@ -65,7 +65,7 @@ Rate limiting runs per IP before the model is called (`lib/rate-limit.ts`).
 flowchart TB
   subgraph prompts["Routing"]
     SP[system-prompt.ts]
-    TS[tools.ts — Zod schemas]
+    TS[tools.ts - Zod schemas]
   end
 
   subgraph api["API"]
@@ -111,12 +111,12 @@ flowchart TB
 
 The model does **not** pick React components from a runtime catalog. Developers define scenes; the model fills schemas.
 
-### Layer 1 — Primitives (`components/ui/`)
+### Layer 1 - Primitives (`components/ui/`)
 
 shadcn/ui: Dialog, Skeleton, Tooltip, etc.  
 Global tokens and utilities in `app/globals.css` (light/dark, Geist, `.glass`, `--ease-out-strong`).
 
-### Layer 2 — Blocks (`components/blocks/`)
+### Layer 2 - Blocks (`components/blocks/`)
 
 Reusable scene building blocks:
 
@@ -130,9 +130,9 @@ Reusable scene building blocks:
 | `SceneImage` | Emoji placeholder → lazy `/api/image` photo |
 | `ItemRow`, `MediaTile`, `StatCompareRow`, … | Domain-specific rows and tiles |
 
-### Layer 3 — Scenes (`components/scenes/`)
+### Layer 3 - Scenes (`components/scenes/`)
 
-One React component per tool — fixed layout templates:
+One React component per tool - fixed layout templates:
 
 | Tool | Component |
 | --- | --- |
@@ -173,8 +173,8 @@ flowchart TD
 
 | User intent | Scene |
 | --- | --- |
-| "Recommend a movie", "best sushi" | **Browse** — `mediaGrid`, `restaurantList` (multiple options) |
-| "Tell me more about La La Land", "Mizumi" | **Detail** — `itemDetail`, `placeDetail` (one named thing) |
+| "Recommend a movie", "best sushi" | **Browse** - `mediaGrid`, `restaurantList` (multiple options) |
+| "Tell me more about La La Land", "Mizumi" | **Detail** - `itemDetail`, `placeDetail` (one named thing) |
 
 This rule lives in the system prompt so singular phrasing ("recommend me *a* movie") still gets a grid, not a single-item detail page.
 
@@ -202,7 +202,7 @@ stateDiagram-v2
 
 - **`SceneSkeleton`** shows until any tool input exists.
 - **`scene-renderer.tsx`** crossfades skeleton → scene with `AnimatePresence mode="popLayout"`.
-- Components must render with `undefined` fields — never assume the full object is present.
+- Components must render with `undefined` fields - never assume the full object is present.
 
 ---
 
@@ -210,7 +210,7 @@ stateDiagram-v2
 
 For requests that don't fit a dedicated template, the model uses **`canvas`**: an ordered list of 2–7 sections.
 
-Section kinds (fixed enum — not free-form JSX):
+Section kinds (fixed enum - not free-form JSX):
 
 | Kind | Renders as |
 | --- | --- |
@@ -276,7 +276,7 @@ flowchart LR
 | Runtime | Can imply code generation | Fixed React components |
 | Tradeoff | Maximum expressiveness | Predictable streaming, types, polish |
 
-Airchat is **generative within a design system** — a practical v1 that ships, streams reliably, and has one place to refine motion and layout.
+Airchat is **generative within a design system** - a practical v1 that ships, streams reliably, and has one place to refine motion and layout.
 
 ---
 
@@ -292,7 +292,7 @@ Airchat is **generative within a design system** — a practical v1 that ships, 
 | Strong Lighthouse scores | Content is model-invented, not fact-checked |
 | | No production monitoring / analytics |
 
-**Recommendation:** Launch as *"Try Airchat — generative UI chat demo."* Position self-hosting + BYOK for heavy use. Tighten demo limits or add auth before marketing it as always-free infrastructure.
+**Recommendation:** Launch as *"Try Airchat - generative UI chat demo."* Position self-hosting + BYOK for heavy use. Tighten demo limits or add auth before marketing it as always-free infrastructure.
 
 ---
 
@@ -305,10 +305,10 @@ flowchart LR
   C --> D[scene-renderer case]
 ```
 
-1. **`lib/ai/tools.ts`** — add tool with Zod `inputSchema` + description.
-2. **`lib/ai/system-prompt.ts`** — when the model should pick it.
-3. **`components/scenes/your-scene.tsx`** — compose from `components/blocks/`.
-4. **`components/chat/scene-renderer.tsx`** — `case "tool-yourScene":`.
+1. **`lib/ai/tools.ts`** - add tool with Zod `inputSchema` + description.
+2. **`lib/ai/system-prompt.ts`** - when the model should pick it.
+3. **`components/scenes/your-scene.tsx`** - compose from `components/blocks/`.
+4. **`components/chat/scene-renderer.tsx`** - `case "tool-yourScene":`.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for PR conventions and [AGENTS.md](./AGENTS.md) for agent/coding conventions.
 

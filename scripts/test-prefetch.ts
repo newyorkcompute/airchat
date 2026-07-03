@@ -38,8 +38,8 @@ async function main() {
   const first = await prefetchAssistantMessage([], "Hello", controller.signal);
   console.log("turn 1:", JSON.stringify(summarize(first, Date.now() - started)));
 
-  // Turn 2: prefetch on top of a history that contains an injected turn —
-  // exercises convertToModelMessages with our client-built messages.
+  // Turn 2: prefetch on top of a history that contains an injected turn.
+  // Exercises convertToModelMessages with our client-built messages.
   const { makeUserMessage } = await import("../lib/prefetch");
   const history = [makeUserMessage("Hello"), first];
   started = Date.now();

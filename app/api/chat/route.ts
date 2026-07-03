@@ -12,7 +12,7 @@ const MAX_TEXT_LENGTH = 2000;
 export async function POST(request: Request) {
   if (isRateLimited(clientIp(request))) {
     return Response.json(
-      { error: "Too many requests — take a breath and try again in a minute." },
+      { error: "Too many requests. Take a breath and try again in a minute." },
       { status: 429 }
     );
   }
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   const result = streamText({
     model: MODEL_ID,
     system: SYSTEM_PROMPT,
-    // Stop generating when the client disconnects — abandoned speculative
+    // Stop generating when the client disconnects so abandoned speculative
     // prefetches from the UI get cancelled instead of burning tokens.
     abortSignal: request.signal,
     messages: await convertToModelMessages(messages.slice(-MAX_MESSAGES)),

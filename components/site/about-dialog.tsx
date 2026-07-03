@@ -13,7 +13,7 @@ const FEATURES = [
   {
     emoji: "🖼️",
     title: "Visual answers",
-    text: "Every reply is a designed scene — cards, comparisons, recipes, guides.",
+    text: "Every reply is a designed scene - cards, comparisons, recipes, guides.",
   },
   {
     emoji: "👆",
@@ -28,7 +28,7 @@ const FEATURES = [
   {
     emoji: "⌨️",
     title: "Keyboard today, voice soon",
-    text: "Type for now — voice input is on the way.",
+    text: "Type for now - voice input is on the way.",
   },
 ];
 
@@ -50,7 +50,7 @@ export function AboutDialog({
             Airchat
           </DialogTitle>
           <DialogDescription className="max-w-xs text-balance text-sm leading-relaxed">
-            A generative-UI chat app — every answer becomes a rich visual
+            A generative-UI chat app - every answer becomes a rich visual
             scene, not a wall of text.
           </DialogDescription>
         </div>

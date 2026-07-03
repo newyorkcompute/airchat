@@ -4,7 +4,7 @@
  *
  * Good enough to blunt casual abuse of AI credits without a database.
  * Note: state is per serverless instance, so the effective limit is
- * "per IP per warm instance" — an acceptable trade-off for simplicity.
+ * "per IP per warm instance". An acceptable trade-off for simplicity.
  */
 
 const hits = new Map<string, number[]>();

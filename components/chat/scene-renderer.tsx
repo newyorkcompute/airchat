@@ -34,7 +34,7 @@ function ScenePart({ part }: { part: Part }) {
 
   // Shimmer until any input has streamed in. `popLayout` lifts the
   // exiting skeleton out of the flow so the scene takes its place
-  // immediately and the shimmer fades out *on top* of it — the swap
+  // immediately and the shimmer fades out *on top* of it - the swap
   // reads as the skeleton resolving into content, not a hard cut.
   const showSkeleton =
     !("input" in part) ||

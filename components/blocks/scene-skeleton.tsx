@@ -21,7 +21,7 @@ const anchorPulse = (el: HTMLDivElement | null) => {
  */
 export function SceneSkeleton() {
   return (
-    // Faster pulse than the 2s default — quicker loading indicators make
+    // Faster pulse than the 2s default - quicker loading indicators make
     // the wait feel shorter (perceived performance).
     <div
       ref={anchorPulse}

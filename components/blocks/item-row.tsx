@@ -8,7 +8,7 @@ import { useSceneActions } from "@/components/chat/scene-context";
 
 /**
  * List row for a place: emoji avatar, name/rating line, blurb, tags.
- * Tappable when `ask` is provided — sends it as the next turn (with
+ * Tappable when `ask` is provided - sends it as the next turn (with
  * hover/touch prefetch), opening a detail scene.
  */
 export function ItemRow({

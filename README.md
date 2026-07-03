@@ -1,10 +1,10 @@
 # Airchat
 
-**AI with a visual interface.** Every answer is a full-screen, interactive scene — not a wall of text.
+**AI with a visual interface.** Every answer is a full-screen, interactive scene - not a wall of text.
 
 Live demo: **[useairchat.vercel.app](https://useairchat.vercel.app)** · **[How it works →](./ARCHITECTURE.md)**
 
-Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model designs the UI on every turn.
+Inspired by [Monogram](https://www.monogram.ai/) - a chat where the model designs the UI on every turn.
 
 <p align="center">
   <img src="docs/screenshots/landing.png" alt="Airchat landing page" width="720" />
@@ -20,7 +20,7 @@ Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model desi
 
 ## What it does
 
-- Ask for sushi spots, compare EVs, bake a recipe, pick a movie — the model picks a **scene tool** and streams structured UI you can tap into.
+- Ask for sushi spots, compare EVs, bake a recipe, pick a movie - the model picks a **scene tool** and streams structured UI you can tap into.
 - **Drill down**: tappable items carry follow-up prompts; hover prefetches the next scene.
 - **Images**: the model authors search queries; Brave Image Search fills in photos with heavy caching.
 - **Canvas**: for open-ended asks, the model composes custom pages from sections (hero, cards, timeline, gallery, …).
@@ -32,7 +32,7 @@ Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model desi
 
 ## Run locally
 
-**You bring your own API keys** — nothing is bundled.
+**You bring your own API keys** - nothing is bundled.
 
 1. Clone and install:
 
@@ -66,7 +66,7 @@ Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model desi
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnewyorkcompute%2Fairchat&env=AI_GATEWAY_API_KEY,BRAVE_SEARCH_API_KEY&envDescription=API%20keys%20for%20Airchat&project-name=airchat)
 
-Set `AI_GATEWAY_API_KEY` and `BRAVE_SEARCH_API_KEY` in the Vercel project settings. The hosted demo at useairchat.vercel.app is rate-limited — self-host for heavy use.
+Set `AI_GATEWAY_API_KEY` and `BRAVE_SEARCH_API_KEY` in the Vercel project settings. The hosted demo at useairchat.vercel.app is rate-limited - self-host for heavy use.
 
 [CONTRIBUTING.md](./CONTRIBUTING.md) · [AGENTS.md](./AGENTS.md)
 

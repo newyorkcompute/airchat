@@ -3,7 +3,7 @@ import { z } from "zod";
 
 /**
  * Scene tools: the model answers every turn by calling exactly one of these.
- * The tool INPUT is the UI — it streams to the client and is rendered as a
+ * The tool INPUT is the UI - it streams to the client and is rendered as a
  * full-bleed scene. `execute` is a no-op acknowledgement.
  */
 
@@ -18,7 +18,7 @@ const emoji = z.string().describe("A single emoji");
 /**
  * Every tappable item carries the follow-up prompt it fires when tapped.
  * The model authors it, so the UI never has to invent per-domain prompt
- * strings — this is what makes drill-down work for any kind of entity.
+ * strings - this is what makes drill-down work for any kind of entity.
  */
 const ask = z
   .string()
@@ -181,7 +181,7 @@ export const sceneTools = {
 
   itemDetail: tool({
     description:
-      "Show a rich detail page for ONE specific named thing that is not a venue: a movie, show, book, album, podcast, game, car, product, gadget, etc. ONLY use when the user refers to one specific item by name (e.g. 'tell me more about La La Land', 'tell me more about the Lucid Air'). NEVER use for recommendation/discovery requests — those go to mediaGrid, even when phrased in the singular ('recommend me a movie').",
+      "Show a rich detail page for ONE specific named thing that is not a venue: a movie, show, book, album, podcast, game, car, product, gadget, etc. ONLY use when the user refers to one specific item by name (e.g. 'tell me more about La La Land', 'tell me more about the Lucid Air'). NEVER use for recommendation/discovery requests - those go to mediaGrid, even when phrased in the singular ('recommend me a movie').",
     inputSchema: z.object({
       intro,
       emoji,
@@ -222,7 +222,7 @@ export const sceneTools = {
 
   mediaGrid: tool({
     description:
-      "Show sectioned recommendations of movies, shows, books, music, podcasts or games. Use for ALL recommendation/discovery requests, including singular phrasing like 'recommend me a movie' or 'find me something to watch' — always give multiple options across 1-3 themed sections so the user can browse and pick.",
+      "Show sectioned recommendations of movies, shows, books, music, podcasts or games. Use for ALL recommendation/discovery requests, including singular phrasing like 'recommend me a movie' or 'find me something to watch' - always give multiple options across 1-3 themed sections so the user can browse and pick.",
     inputSchema: z.object({
       intro,
       sections: z
@@ -256,7 +256,7 @@ export const sceneTools = {
 
   canvas: tool({
     description:
-      "Design a custom page from composable sections for anything without a dedicated scene: travel itineraries, plans, guides, timelines, breakdowns, briefs, tutorials, rich explanations. You choose the sections, their order, and their content — compose 2-7 sections that best express the answer visually.",
+      "Design a custom page from composable sections for anything without a dedicated scene: travel itineraries, plans, guides, timelines, breakdowns, briefs, tutorials, rich explanations. You choose the sections, their order, and their content - compose 2-7 sections that best express the answer visually.",
     inputSchema: z.object({
       intro,
       sections: z

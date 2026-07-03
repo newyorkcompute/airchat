@@ -35,7 +35,7 @@ function resolveImage(q: string): Promise<string | null> {
 /**
  * Visual block for any scene item: renders the emoji instantly, then
  * resolves `query` via /api/image and cross-fades to the photo.
- * If the lookup fails or `query` is absent, the emoji simply stays —
+ * If the lookup fails or `query` is absent, the emoji simply stays  - 
  * images are pure progressive enhancement.
  *
  * Lookups only fire when the block nears the viewport: long scenes

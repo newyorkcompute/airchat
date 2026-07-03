@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the report. If this is about the **hosted demo** at useairchat.vercel.app, note it's rate-limited — try reproducing locally first.
+        Thanks for the report. If this is about the **hosted demo** at useairchat.vercel.app, note it's rate-limited - try reproducing locally first.
 
   - type: textarea
     id: description

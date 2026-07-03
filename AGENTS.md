@@ -1,7 +1,7 @@
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version has breaking changes - APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
 # airchat
@@ -10,16 +10,16 @@ Generative-UI chat: every assistant turn is a tool call that renders a full-scre
 
 ## Architecture
 
-- `lib/ai/tools.ts` — Zod schemas for every scene tool; `lib/ai/system-prompt.ts` — routing rules. Add a scene = schema + prompt rule + component + case in `components/chat/scene-renderer.tsx`.
-- `components/scenes/*` — one component per tool; `components/blocks/*` — shared building blocks (SceneShell, Tappable, SceneImage, …); `components/ui/*` — shadcn primitives.
-- Scene inputs stream in **partially** (DeepPartial): every field may be `undefined` at any moment — components must render gracefully from incomplete data.
+- `lib/ai/tools.ts` - Zod schemas for every scene tool; `lib/ai/system-prompt.ts` - routing rules. Add a scene = schema + prompt rule + component + case in `components/chat/scene-renderer.tsx`.
+- `components/scenes/*` - one component per tool; `components/blocks/*` - shared building blocks (SceneShell, Tappable, SceneImage, …); `components/ui/*` - shadcn primitives.
+- Scene inputs stream in **partially** (DeepPartial): every field may be `undefined` at any moment - components must render gracefully from incomplete data.
 - Tappable items carry model-authored `ask` (follow-up prompt) and `imageQuery` (resolved via `/api/image`, Brave Search) fields.
 - API routes are rate-limited per IP (`lib/rate-limit.ts`).
 
 ## Conventions
 
 - Animations follow the standards in `.agents/skills/` (Emil Kowalski): strong ease-out (`EASE_OUT` from scene-shell / `ease-out-strong`), exits faster than enters, subtle press scales, transform/opacity only.
-- Scroll between turns is a custom rAF "camera" glide in `components/chat/chat.tsx` — don't replace it with `scrollIntoView`.
+- Scroll between turns is a custom rAF "camera" glide in `components/chat/chat.tsx` - don't replace it with `scrollIntoView`.
 
 ## Workflow
 

@@ -96,13 +96,13 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
     <motion.div
       // Entrance is CSS (animate-in), not Motion: Motion would inline
       // `opacity: 0` into the server HTML and hold the whole landing
-      // invisible until hydration — tanking LCP. CSS starts at first
+      // invisible until hydration - tanking LCP. CSS starts at first
       // paint. Motion still owns the exit.
       initial={false}
       exit={{
         opacity: 0,
         transform: "translateY(-24px)",
-        // Exit is a system response to the user's send — snap out faster.
+        // Exit is a system response to the user's send - snap out faster.
         transition: { duration: 0.25, ease: EASE_OUT },
       }}
       // Overlay, not flow: while this exits, the first turn must already
@@ -114,7 +114,7 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
       className="absolute inset-x-0 top-0 z-[15] flex min-h-dvh animate-in flex-col items-center bg-background px-6 text-center duration-500 slide-in-from-bottom-6"
     >
       {/* Hero fills the area above the mid-screen composer (its pill
-          center sits at 48dvh — keep these in sync with composer.tsx). */}
+          center sits at 48dvh - keep these in sync with composer.tsx). */}
       <div className="flex h-[48dvh] flex-col items-center justify-end gap-4 pb-12">
         <div className="flex size-14 items-center justify-center rounded-2xl bg-foreground text-background">
           <Sparkles className="size-7" />
@@ -123,7 +123,7 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
           Airchat
         </h1>
         <p className="max-w-sm text-balance text-muted-foreground">
-          AI with a visual interface. Ask anything — the answer is a whole new
+          AI with a visual interface. Ask anything - the answer is a whole new
           screen.
         </p>
       </div>
@@ -131,7 +131,7 @@ function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
         {SUGGESTIONS.map((s, i) => (
           <motion.button
             key={s.label}
-            // CSS entrance (paints without waiting for hydration — these
+            // CSS entrance (paints without waiting for hydration - these
             // chips are the page's LCP element); Motion handles the tap.
             initial={false}
             whileTap={{ scale: 0.96 }}
@@ -196,7 +196,7 @@ export function Chat() {
   // down and keeps the new turn pinned to the top while the scene streams
   // in and the page grows underneath. Exponential smoothing toward a
   // re-read target every frame means a moving target (growing content,
-  // restarted glides) never causes a velocity jump — the motion just
+  // restarted glides) never causes a velocity jump - the motion just
   // keeps easing toward wherever the target is now.
   const glideToElement = (el: HTMLElement, follow = false) => {
     stopGlideRef.current?.();

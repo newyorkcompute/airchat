@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Airchat — AI with a visual interface",
+  title: "Airchat - AI with a visual interface",
   description:
     "A chat where every answer is a freshly generated, interactive UI.",
 };

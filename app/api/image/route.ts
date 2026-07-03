@@ -3,7 +3,7 @@ import { isRateLimited, clientIp } from "@/lib/rate-limit";
 /**
  * Resolves a short query ("Lucid Air sedan", "Paddington 2 movie poster")
  * to one image URL via the Brave Image Search API. Scenes call this after
- * they render, so images are progressive enhancement — the emoji
+ * they render, so images are progressive enhancement - the emoji
  * placeholder stays if this fails.
  *
  * Cached: in-flight dedupe (this instance), memory (with TTL), Next data
@@ -16,7 +16,7 @@ const cache = new Map<string, CacheEntry>();
 const inflight = new Map<string, Promise<string | null>>();
 const MAX_QUERY_LENGTH = 100;
 const SUCCESS_TTL_MS = 60 * 60 * 24 * 30 * 1000; // 30 days
-const FAILURE_TTL_MS = 15 * 60 * 1000; // 15 minutes — transient Brave errors
+const FAILURE_TTL_MS = 15 * 60 * 1000; // 15 minutes - transient Brave errors
 
 type BraveImageResult = {
   thumbnail?: { src?: string };
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
     return Response.json({ error: "Image search not configured" }, { status: 503 });
   }
 
-  // Normalize aggressively — every cache layer keys on this string.
+  // Normalize aggressively - every cache layer keys on this string.
   const q = new URL(request.url).searchParams
     .get("q")
     ?.trim()

@@ -14,7 +14,7 @@ function Annotation({
     <div className="mt-1.5 flex h-5 items-center justify-center">
       {kind === "none" || !text ? (
         <span className="text-muted-foreground/50" aria-hidden>
-          —
+          -
         </span>
       ) : (
         <span
