@@ -11,7 +11,11 @@ Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model desi
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/comparison.png" alt="EV comparison scene" width="720" />
+  <img src="docs/screenshots/sushi.png" alt="Sushi restaurant list scene" width="720" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/recipe.png" alt="Cookie recipe scene" width="720" />
 </p>
 
 ## What it does
