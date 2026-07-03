@@ -26,10 +26,10 @@ export function SceneShell({
 }) {
   return (
     <motion.section
-      // Subtle rise: the viewport camera glide and the skeleton crossfade
-      // already provide the motion — a big translate here would fight them.
-      initial={{ opacity: 0, transform: "translateY(16px) scale(0.99)" }}
-      animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
+      // Opacity only — a transform on this wrapper would break
+      // `position: sticky` for any descendant that needs it.
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.45, ease: EASE_OUT }}
       className={cn(
         "relative flex min-h-[calc(100dvh-1rem)] w-full flex-col pb-36",

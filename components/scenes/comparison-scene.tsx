@@ -58,8 +58,7 @@ export function ComparisonScene({
     <SceneShell>
       <SceneIntro text={input?.intro} />
 
-      {/* Sticky contender header, pinned just below the prompt bar */}
-      <div className="sticky top-14 z-10 mx-auto w-full max-w-2xl px-4 pt-4">
+      <div className="mx-auto w-full max-w-2xl px-4 pt-2">
         <div className="grid grid-cols-2 gap-6 rounded-3xl bg-card/95 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_40px_-20px_rgba(0,0,0,0.25)] ring-1 ring-border/60 backdrop-blur">
           <ItemHeader {...input?.itemA} />
           <ItemHeader {...input?.itemB} />
