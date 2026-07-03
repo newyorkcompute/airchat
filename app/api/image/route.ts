@@ -6,17 +6,84 @@ import { isRateLimited, clientIp } from "@/lib/rate-limit";
  * they render, so images are progressive enhancement — the emoji
  * placeholder stays if this fails.
  *
- * Cached three ways: per-instance memory, Vercel's CDN (s-maxage), and
- * the browser — image queries repeat heavily across users.
+ * Cached: in-flight dedupe (this instance), memory (with TTL), Next data
+ * cache on the Brave fetch, CDN (s-maxage), and the browser.
  */
 
-const memoryCache = new Map<string, string | null>();
+type CacheEntry = { url: string | null; until: number };
+
+const cache = new Map<string, CacheEntry>();
+const inflight = new Map<string, Promise<string | null>>();
 const MAX_QUERY_LENGTH = 100;
+const SUCCESS_TTL_MS = 60 * 60 * 24 * 30 * 1000; // 30 days
+const FAILURE_TTL_MS = 15 * 60 * 1000; // 15 minutes — transient Brave errors
 
 type BraveImageResult = {
   thumbnail?: { src?: string };
   properties?: { url?: string };
 };
+
+function getCached(q: string): string | null | undefined {
+  const hit = cache.get(q);
+  if (!hit) return undefined;
+  if (Date.now() > hit.until) {
+    cache.delete(q);
+    return undefined;
+  }
+  return hit.url;
+}
+
+function setCached(q: string, url: string | null, ttlMs: number) {
+  cache.set(q, { url, until: Date.now() + ttlMs });
+  if (cache.size > 2_000) {
+    cache.delete(cache.keys().next().value as string);
+  }
+}
+
+async function fetchFromBrave(q: string, apiKey: string): Promise<string | null> {
+  const res = await fetch(
+    `https://api.search.brave.com/res/v1/images/search?q=${encodeURIComponent(q)}&count=1&safesearch=strict`,
+    {
+      headers: {
+        "X-Subscription-Token": apiKey,
+        Accept: "application/json",
+      },
+      // Next's persistent data cache: survives cold starts and is shared
+      // across serverless instances, unlike the in-memory map above.
+      next: { revalidate: 60 * 60 * 24 * 30 },
+    }
+  );
+  if (!res.ok) throw new Error(`Brave responded ${res.status}`);
+  const data: { results?: BraveImageResult[] } = await res.json();
+  return (
+    data.results
+      ?.map((r) => r.thumbnail?.src ?? r.properties?.url)
+      .find(Boolean) ?? null
+  );
+}
+
+function resolveImage(q: string, apiKey: string): Promise<string | null> {
+  const hit = getCached(q);
+  if (hit !== undefined) return Promise.resolve(hit);
+
+  let promise = inflight.get(q);
+  if (!promise) {
+    promise = fetchFromBrave(q, apiKey)
+      .then((url) => {
+        setCached(q, url, SUCCESS_TTL_MS);
+        return url;
+      })
+      .catch(() => {
+        setCached(q, null, FAILURE_TTL_MS);
+        return null;
+      })
+      .finally(() => {
+        inflight.delete(q);
+      });
+    inflight.set(q, promise);
+  }
+  return promise;
+}
 
 export async function GET(request: Request) {
   const apiKey = process.env.BRAVE_SEARCH_API_KEY;
@@ -24,9 +91,7 @@ export async function GET(request: Request) {
     return Response.json({ error: "Image search not configured" }, { status: 503 });
   }
 
-  // Normalize aggressively — every cache layer (memory, Next data cache,
-  // CDN, browser) is keyed by this string, so "Lucid Air  Sedan" and
-  // "lucid air sedan" must be one entry, not two Brave calls.
+  // Normalize aggressively — every cache layer keys on this string.
   const q = new URL(request.url).searchParams
     .get("q")
     ?.trim()
@@ -37,54 +102,16 @@ export async function GET(request: Request) {
     return Response.json({ error: "Missing q" }, { status: 400 });
   }
 
-  // Scenes fire a burst of lookups (one per tile), so this bucket is much
-  // looser than the chat limit.
   if (isRateLimited(clientIp(request), { bucket: "image", max: 60 })) {
     return Response.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  let url = memoryCache.get(q);
-
-  if (url === undefined) {
-    try {
-      const res = await fetch(
-        `https://api.search.brave.com/res/v1/images/search?q=${encodeURIComponent(q)}&count=3&safesearch=strict`,
-        {
-          headers: {
-            "X-Subscription-Token": apiKey,
-            Accept: "application/json",
-          },
-          // Next's persistent data cache: survives cold starts and is
-          // shared across serverless instances, unlike memoryCache. An
-          // image for a query has no freshness needs — cache for 30 days.
-          next: { revalidate: 60 * 60 * 24 * 30 },
-        }
-      );
-      if (!res.ok) throw new Error(`Brave responded ${res.status}`);
-      const data: { results?: BraveImageResult[] } = await res.json();
-      // Prefer Brave's proxied thumbnails: consistent sizing and no
-      // hotlink/CORS surprises from arbitrary origin servers.
-      url =
-        data.results
-          ?.map((r) => r.thumbnail?.src ?? r.properties?.url)
-          .find(Boolean) ?? null;
-    } catch {
-      // Report "no image" but don't cache the failure, so a transient
-      // Brave error doesn't stick for the instance's lifetime.
-      return Response.json({ url: null }, { status: 200 });
-    }
-    memoryCache.set(q, url);
-    if (memoryCache.size > 2_000) {
-      memoryCache.delete(memoryCache.keys().next().value as string);
-    }
-  }
+  const url = await resolveImage(q, apiKey);
 
   return Response.json(
     { url },
     {
       headers: {
-        // A query's image never needs to be fresh: 30 days on the CDN,
-        // a day in the browser, serve stale while revalidating.
         "Cache-Control":
           "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=2592000",
       },
