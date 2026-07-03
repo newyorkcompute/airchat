@@ -70,29 +70,9 @@ Set `AI_GATEWAY_API_KEY` and `BRAVE_SEARCH_API_KEY` in the Vercel project settin
 
 ## Architecture
 
-```
-User message → /api/chat → model picks one scene tool → streams tool input
-                              ↓
-                    components/chat/scene-renderer.tsx
-                              ↓
-                    components/scenes/*  (full-screen scene)
-                              ↓
-                    components/blocks/*  (SceneShell, Tappable, SceneImage, …)
-```
+Every turn the model calls one scene tool; the JSON input streams to the client and a React scene component renders it (`lib/ai/tools.ts` → `scene-renderer.tsx` → `components/scenes/*`, built from `components/blocks/*`).
 
-| Layer | Path | Role |
-| --- | --- | --- |
-| Tool schemas | `lib/ai/tools.ts` | Zod shapes the model must fill |
-| Routing rules | `lib/ai/system-prompt.ts` | When to use which scene |
-| Scene components | `components/scenes/` | One React component per tool |
-| Shared blocks | `components/blocks/` | Layout, images, tappable rows |
-| Chat shell | `components/chat/` | Scroll camera, composer, prompt pill |
-
-Scene tools today: `restaurantList`, `placeDetail`, `comparison`, `recipe`, `itemDetail`, `mediaGrid`, `canvas`, `textResponse`.
-
-Inputs stream in partially — every field may be `undefined` mid-stream; scenes must render gracefully from incomplete data.
-
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for how scene rendering, the design system, and model routing work (with diagrams). [AGENTS.md](./AGENTS.md) covers coding conventions; [CONTRIBUTING.md](./CONTRIBUTING.md) for how to add a scene.
+See **[ARCHITECTURE.md](./ARCHITECTURE.md)** for diagrams, routing rules, the design system, and how to add a scene. [AGENTS.md](./AGENTS.md) covers coding conventions; [CONTRIBUTING.md](./CONTRIBUTING.md) for PRs.
 
 ## License
 
