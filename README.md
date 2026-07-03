@@ -2,7 +2,7 @@
 
 **AI with a visual interface.** Every answer is a full-screen, interactive scene — not a wall of text.
 
-Live demo: **[useairchat.vercel.app](https://useairchat.vercel.app)**
+Live demo: **[useairchat.vercel.app](https://useairchat.vercel.app)** · **[How it works →](./ARCHITECTURE.md)**
 
 Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model designs the UI on every turn.
 
@@ -68,11 +68,7 @@ Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model desi
 
 Set `AI_GATEWAY_API_KEY` and `BRAVE_SEARCH_API_KEY` in the Vercel project settings. The hosted demo at useairchat.vercel.app is rate-limited — self-host for heavy use.
 
-## Architecture
-
-Every turn the model calls one scene tool; the JSON input streams to the client and a React scene component renders it (`lib/ai/tools.ts` → `scene-renderer.tsx` → `components/scenes/*`, built from `components/blocks/*`).
-
-See **[ARCHITECTURE.md](./ARCHITECTURE.md)** for diagrams, routing rules, the design system, and how to add a scene. [AGENTS.md](./AGENTS.md) covers coding conventions; [CONTRIBUTING.md](./CONTRIBUTING.md) for PRs.
+[CONTRIBUTING.md](./CONTRIBUTING.md) · [AGENTS.md](./AGENTS.md)
 
 ## License
 
