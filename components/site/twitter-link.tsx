@@ -3,6 +3,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { LAUNCH_TWEET_URL } from "@/lib/site-links";
 
 export function XLogo({ className }: { className?: string }) {
   return (
@@ -23,17 +24,17 @@ export function TwitterLink() {
       <TooltipTrigger
         render={
           <a
-            href="https://x.com/siddharthkul"
+            href={LAUNCH_TWEET_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Follow on X"
+            aria-label="Launch thread on X"
             className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground dark:hover:bg-white/10"
           >
             <XLogo className="size-4" />
           </a>
         }
       />
-      <TooltipContent side="bottom">Follow on X</TooltipContent>
+      <TooltipContent side="bottom">Launch thread</TooltipContent>
     </Tooltip>
   );
 }

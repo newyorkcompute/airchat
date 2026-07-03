@@ -2,6 +2,7 @@
 
 import { Sparkles } from "lucide-react";
 import { XLogo } from "@/components/site/twitter-link";
+import { AUTHOR_X_URL, LAUNCH_TWEET_URL } from "@/lib/site-links";
 import {
   Dialog,
   DialogContent,
@@ -69,14 +70,22 @@ export function AboutDialog({
           ))}
         </ul>
 
-        <div className="flex items-center justify-center rounded-b-3xl border-t border-border/60 bg-muted/40 px-6 py-4">
+        <div className="flex flex-col items-center gap-2 rounded-b-3xl border-t border-border/60 bg-muted/40 px-6 py-4">
           <a
-            href="https://x.com/siddharthkul"
+            href={LAUNCH_TWEET_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <XLogo className="size-3.5" />
+            Launch thread
+          </a>
+          <a
+            href={AUTHOR_X_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-muted-foreground/80 transition-colors hover:text-foreground"
+          >
             Siddharth Kulkarni
           </a>
         </div>
