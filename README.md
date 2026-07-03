@@ -6,6 +6,14 @@ Live demo: **[useairchat.vercel.app](https://useairchat.vercel.app)**
 
 Inspired by [Monogram](https://www.monogram.ai/) — a chat where the model designs the UI on every turn.
 
+<p align="center">
+  <img src="docs/screenshots/landing.png" alt="Airchat landing page" width="720" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/comparison.png" alt="EV comparison scene" width="720" />
+</p>
+
 ## What it does
 
 - Ask for sushi spots, compare EVs, bake a recipe, pick a movie — the model picks a **scene tool** and streams structured UI you can tap into.
@@ -80,7 +88,7 @@ Scene tools today: `restaurantList`, `placeDetail`, `comparison`, `recipe`, `ite
 
 Inputs stream in partially — every field may be `undefined` mid-stream; scenes must render gracefully from incomplete data.
 
-See [AGENTS.md](./AGENTS.md) for conventions and [CONTRIBUTING.md](./CONTRIBUTING.md) for how to add a scene.
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for how scene rendering, the design system, and model routing work (with diagrams). [AGENTS.md](./AGENTS.md) covers coding conventions; [CONTRIBUTING.md](./CONTRIBUTING.md) for how to add a scene.
 
 ## Roadmap
 
